@@ -1,4 +1,4 @@
-class Portfolio:
+class singleStockPortfolio:
     def __init__(self, cash: float = 0, stockAmount: int = 0, stockValue: float = 0, fee: float = 0.25) -> None:
         self.cash = cash
         self.stockAmount = stockAmount
@@ -60,7 +60,7 @@ class Portfolio:
         return string
     
 if __name__ == "__main__":
-    port = Portfolio()
+    port = singleStockPortfolio()
     print(port)
     print("----------")
 
