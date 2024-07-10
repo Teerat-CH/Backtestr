@@ -7,23 +7,23 @@ class Portfolio:
         self.stockDirectory = {}
         self.log = []
 
-    def buy(self, name: str, stockAmount: int, stockPrice: float) -> bool:
+    def buy(self, stockName: str, stockAmount: int, stockPrice: float) -> bool:
         if self.cash > stockPrice * stockAmount * (100 + self.fee) / 100:
             self.cash -= stockPrice * stockAmount * (100 + self.fee) / 100
-            if (name in self.stockDirectory):
-                stockTracker = self.stockDirectory[name]
+            if (stockName in self.stockDirectory):
+                stockTracker = self.stockDirectory[stockName]
                 stockTracker.add(stockAmount, stockPrice)
             else:
                 stockTracker = StockTracker()
-                self.stockDirectory[name] = stockTracker
-                stockTracker = self.stockDirectory[name]
+                self.stockDirectory[stockName] = stockTracker
+                stockTracker = self.stockDirectory[stockName]
                 stockTracker.add(stockAmount, stockPrice)
             return True
         return False
 
-    def sell(self, name: str, stockPrice: float) -> bool:
-        if (name in self.stockDirectory):
-                stockTracker = self.stockDirectory[name]
+    def sell(self, stockName: str, stockPrice: float) -> bool:
+        if (stockName in self.stockDirectory):
+                stockTracker = self.stockDirectory[stockName]
                 if stockTracker.getStockAmount() > 0:
                     self.cash += stockTracker.getStockAmount() * stockPrice * (100 - self.fee) / 100
                     stockTracker.remove()
@@ -41,12 +41,22 @@ class Portfolio:
             self.cash -= cashAmout
             return True
         return False
+    
+    def getStockAmount(self, stockName: str) -> int:
+        if stockName in self.stockDirectory:
+            return self.stockDirectory[stockName].getStockAmount()
+        return -1
 
-    def getStockValue(self) -> float:
-        stockValue = 0
-        for stock in self.stockDirectory:
-            stockValue += self.stockDirectory[stock].getStockValue()
-        return stockValue
+    def getStockValue(self, *args) -> float:
+        if len(args) == 0:
+            stockValue = 0
+            for stock in self.stockDirectory:
+                stockValue += self.stockDirectory[stock].getStockValue()
+            return stockValue
+        if len(args) == 1:
+            if args[0] in self.stockDirectory:
+                return self.stockDirectory[args[0]].getStockValue()
+            return -1
 
     def getNetValue(self) -> float:
         return self.cash + self.getStockValue()
@@ -57,8 +67,8 @@ class Portfolio:
     def setFee(self, fee) -> None:
         self.fee = fee
 
-    def addLog(self, action: str, name: str, amount: int, price: float, date: object) -> None:
-        self.log.append(action + " " + str(amount) + str(name) + " stocks at " + str(price) + " on " + str(date))
+    def addLog(self, action: str, stockName: str, amount: int, price: float, date: object) -> None:
+        self.log.append(action + " " + str(amount) + str(stockName) + " stocks at " + str(price) + " on " + str(date))
 
     def getLog(self) -> list:
         return self.log
@@ -90,3 +100,6 @@ if __name__ == "__main__":
     port.buy("MSFT", 20, 10)
     print(port)
     print("----------")
+
+    print(port.getStockValue("MSFT"))
+    print(port.getStockValue("NVIDIA"))

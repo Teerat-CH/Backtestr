@@ -1,5 +1,7 @@
 import unittest
 from SingleStockPortfolio import SingleStockPortfolio
+from StockTracker import StockTracker
+from Portfolio import Portfolio
 
 class Test_SingleStockPortfolio(unittest.TestCase):
 
@@ -58,6 +60,21 @@ class Test_SingleStockPortfolio(unittest.TestCase):
         port.addLog("Buy", 100, 10, datetime.now())
         self.assertEqual(1, len(port.getLog()))
         self.assertEqual("Buy 100 stocks at 10 on " + str(datetime.now()), port.getLog()[0])
+
+class Test_StockTracker(unittest.TestCase):
+
+    def test_initializeEmptyStockTracker(self):
+        tracker = StockTracker()
+        self.assertEqual(0, tracker.getStockAmount())
+        self.assertEqual(0, tracker.getStockValue())
+
+class Test_Portfolio(unittest.TestCase):
+
+    def test_initializeEmptyPortfolio(self):
+        portfolio = Portfolio()
+        self.assertEqual(0, portfolio.getCash())
+        self.assertEqual(0, portfolio.getStockValue())
+        self.assertEqual(0, portfolio.getNetValue())
 
 if __name__ == '__main__':
     unittest.main()
