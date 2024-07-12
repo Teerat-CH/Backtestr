@@ -27,6 +27,7 @@ class Portfolio:
                 if stockTracker.getStockAmount() > 0:
                     self.cash += stockTracker.getStockAmount() * stockPrice * (100 - self.fee) / 100
                     stockTracker.remove()
+                    del self.stockDirectory[stockName]
                     return True
         return False
 
@@ -101,5 +102,10 @@ if __name__ == "__main__":
     print(port)
     print("----------")
 
-    print(port.getStockValue("MSFT"))
-    print(port.getStockValue("NVIDIA"))
+    port.sell("MSFT", 15)
+    print(port)
+    print("----------")
+
+    port.sell("APPL", 8)
+    print(port)
+    print("----------")
