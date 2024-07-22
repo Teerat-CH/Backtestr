@@ -44,7 +44,7 @@ def testStochRSI(data):
     holdposition = False
     for i in range(1, len(df) - 1):
         if holdposition == False and df.stochrsi_K[i] < 0.1 and df.stochrsi_K[i+1] > 0.1:
-            # Buy condition: StochRSI K rises from below 0.1 to above 0.1
+            
             action = port.buy(0.0001, df.o[i+1])
             if action != "do nothing":
                 port.addLog('buy', 0.0001, df.o[i+1], str(i+1))
