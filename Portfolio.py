@@ -85,6 +85,61 @@ class Portfolio:
             netStockValue += self.stockDirectory[stock].getStockValue()
         return "Portfolio Summary:\n" + portfolioSummary + "\n" + "Cash: " + str(self.getCash()) + "\n" + "Stock Value: " + str(netStockValue) + "\n" + "Net Value: " + str(netStockValue + self.getCash())
     
+class portfolio:
+    def __init__(self, cash = 0, stock_amount = 0, stock_value = 0, fee = 0.25):
+        self.cash = cash
+        self.stock_amount = stock_amount
+        self.stock_value = stock_value
+        self.net_value = self.cash + self.stock_value
+        self.fee = fee
+        self.log = []
+
+    def buy(self, stock_amount, stock_price):
+        if self.cash > stock_price * stock_amount:
+          self.cash -= stock_price * stock_amount * (100+self.fee)/100
+          self.stock_amount += stock_amount
+          self.stock_value += stock_price * stock_amount
+          self.net_value = self.cash + self.stock_value
+          return "buy"
+        else:
+          return "do nothing"
+
+    def sell(self, stock_price):
+        if self.stock_amount > 0:
+          self.stock_value = 0
+          self.cash += self.stock_amount * stock_price * (100-self.fee)/100
+          self.stock_amount = 0
+          self.net_value = self.cash + self.stock_value
+          return "sell"
+        else:
+          return "do nothing"
+
+    def addFund(self, fund):
+        self.cash += fund
+        self.net_value += fund
+
+    def getCash(self):
+        return self.cash
+
+    def getStockAmount(self):
+        return self.stock_amount
+
+    def getStockValue(self):
+        return self.stock_value
+
+    def getNetValue(self):
+        return self.net_value
+
+    def addLog(self, action, amount, price, date):
+        self.log.append(action + " " + str(amount) + " stocks at " + str(price) + " on " + str(date))
+
+    def getLog(self):
+        return self.log
+
+    def __str__(self) -> str:
+        string = "Cash: " + str(self.cash) + "\nStock Amount: " + str(self.stock_amount) + "\nStock Value: " + str(self.stock_value) + "\nNet Value: " + str(self.net_value)
+        return string
+    
 if __name__ == "__main__":
     port = Portfolio()
     print(port)
