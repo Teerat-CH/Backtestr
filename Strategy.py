@@ -18,7 +18,7 @@ class Strategy:
     def getData(self):
         return self.data
 
-    def hasStrategy(self, strategyType, strategyName: str):
+    def hasStrategy(self, strategyType, strategyName: str) -> bool:
         return strategyName in self.strategySet[strategyType] or False
 
     def makeMA(self, averageInterval: int) -> None:
@@ -26,22 +26,20 @@ class Strategy:
         strategyType = "MA"
         strategyName = str(strategyType) + str(averageInterval)
 
-        if self.hasStrategy(strategyType, strategyName):
-            return "This Strategy already exists"
+        if not self.hasStrategy(strategyType, strategyName):
         
-        self.data[strategyName] = self.data.Close.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
+            self.data[strategyName] = self.data.Close.rolling(averageInterval, adjust = False, min_periods=averageInterval).mean()
 
-        return 
+        return str(strategyName)
 
     def makeEMA(self, averageInterval: int) -> None:
         
         strategyType = "EMA"
         strategyName = str(strategyType) + str(averageInterval)
 
-        if self.hasStrategy(strategyType, strategyName):
-            return "This Strategy already exists"
-        
-        self.data[strategyName] = self.data.Close.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
+        if not self.hasStrategy(strategyType, strategyName):
+
+            self.data[strategyName] = self.data.Close.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
 
         return str(strategyName)
 
@@ -50,19 +48,24 @@ class Strategy:
         MACDName = "MACD(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ")"
         signalName = "Signal(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ", " + str(signalAverageInterval) + ")" 
 
-        if self.hasStrategy("MACD-Signal", signalName):
+        if not self.hasStrategy("MACD-Signal", signalName):
 
             if not self.hasStrategy("MACD", MACDName):
+
+                EMA1Name = "EMA" + str(firstAverageInterval)
+                EMA2Name = "EMA" + str(secondAverageInterval)
         
-                if not self.hasStrategy("EMA", "EMA" + str(firstAverageInterval)):
+                if not self.hasStrategy("EMA", EMA1Name):
                     self.makeEMA(firstAverageInterval)
                 
-                if not self.hasStrategy("EMA", "EMA" + str(secondAverageInterval)):
+                if not self.hasStrategy("EMA", EMA2Name):
                     self.makeEMA(secondAverageInterval)
 
-                # TODO create MACD
-            # TODO create signal
-        return "This Strategy already exists"
+                self.data[MACDName] = self.data[EMA1Name] - self.data[EMA2Name]
+
+            self.data[signalName] = self.data[MACDName].ewm(span=signalAverageInterval, adjust=False, min_periods=signalAverageInterval).mean()
+
+        return (signalName, MACDName)
 
     def makeRSI(self, ):
         pass
