@@ -1,7 +1,7 @@
 import unittest
-from SingleStockPortfolio import SingleStockPortfolio
-from StockTracker import StockTracker
-from Portfolio import Portfolio
+from Archieve.SingleStockPortfolio import SingleStockPortfolio
+from Core.StockTracker import StockTracker
+from Core.Portfolio import Portfolio
 
 class Test_SingleStockPortfolio(unittest.TestCase):
 

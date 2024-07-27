@@ -1,4 +1,4 @@
-from StockTracker import StockTracker
+from Core.StockTracker import StockTracker
 
 class Portfolio:
     def __init__(self, cash: float = 0, fee: float = 0.25) -> None:
