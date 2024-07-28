@@ -2,7 +2,10 @@ from Core.Indicator import Indicator
 from Core.Strategy import Strategy
 from Core.Backtestr import Backtestr
 
-data = somedata
+import streamlit as st
+import yfinance as yf
+
+data = yf.download()
 
 Backtestr = Backtestr(data)
 Indicator = Indicator(data)
@@ -12,6 +15,4 @@ Strategy = Strategy(data)
 
 MACDLine, SignalLine = Indicator.makeMACD(firstAverageInterval=12, secondAverageInterval=26, signalAverageInterval=9)
 Strategy.useCrossOver(MACDLine, SignalLine)
-
 Backtestr.runTest()
-
