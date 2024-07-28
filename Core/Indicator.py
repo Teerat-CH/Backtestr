@@ -113,6 +113,16 @@ class Indicator:
             self.data['StochRSI' + str(averageInterval)] = (self.data[RSIName] - self.data[minName]) / (self.data[maxName] - self.data[minName])
 
         return str(strategyName)
+    
+    def smoothLine(self, strategyType: str, strategyName: str, smoothFactor: int):
+
+        strategyName = str(strategyName) + "-" + str(smoothFactor)
+
+        if not self.hasStrategy(strategyType, strategyName):
+
+            self.data[strategyName] = self.data.Close.rolling(smoothFactor, adjust = False, min_periods=smoothFactor).mean()
+
+        return str(strategyName)
         
     def __str__(self) -> str:
         stringToReturn = "List of Strategy: \n\n"
