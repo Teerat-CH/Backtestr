@@ -20,7 +20,7 @@ class Indicator:
     def hasStrategy(self, strategyType, strategyName: str) -> bool:
         return strategyName in self.strategySet[strategyType] or False
 
-    def makeMA(self, averageInterval: int) -> None:
+    def makeMA(self, averageInterval: int) -> str:
 
         strategyType = "MA"
         strategyName = str(strategyType) + str(averageInterval)
@@ -31,7 +31,7 @@ class Indicator:
 
         return str(strategyName)
 
-    def makeEMA(self, averageInterval: int) -> None:
+    def makeEMA(self, averageInterval: int) -> str:
         
         strategyType = "EMA"
         strategyName = str(strategyType) + str(averageInterval)
@@ -42,7 +42,7 @@ class Indicator:
 
         return str(strategyName)
 
-    def makeMACD(self, firstAverageInterval: int, secondAverageInterval: int, signalAverageInterval: int) -> None:
+    def makeMACD(self, firstAverageInterval: int, secondAverageInterval: int, signalAverageInterval: int) -> str|str:
 
         MACDName = "MACD(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ")"
         signalName = "Signal(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ", " + str(signalAverageInterval) + ")" 
