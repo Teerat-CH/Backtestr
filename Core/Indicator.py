@@ -66,11 +66,53 @@ class Indicator:
 
         return (signalName, MACDName)
 
-    def makeRSI(self, ):
-        pass
+    def makeRSI(self, averageInterval: int) -> None:
 
-    def makeStochRSI(self, ):
-        pass
+        strategyType = "RSI"
+        strategyName = str(strategyType) + str(averageInterval)
+
+        if not self.hasStrategy(strategyType, strategyName):
+
+            # Calculate gain and loss
+            for i in range(len(self.data)):
+                if i > 0:
+                    if self.data.iloc[i]['Close'] > self.data.iloc[i-1]['Close']:
+                        self.data.at[i, 'gain'] = self.data.iloc[i]['CLose'] - self.data.iloc[i-1]['Close']
+                        self.data.at[i, 'loss'] = 0
+                    elif self.data.iloc[i]['Close'] < self.data.iloc[i-1]['Close']:
+                        self.data.at[i, 'loss'] = self.data.iloc[i-1]['Close'] - self.data.iloc[i]['Close']
+                        self.data.at[i, 'gain'] = 0
+                    else:
+                        self.data.at[i, 'gain'] = 0
+                        self.data.at[i, 'loss'] = 0
+
+            self.data['averageGain' + str(averageInterval)] = self.data.gain.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
+            self.data['averageLoss' + str(averageInterval)] = self.data.loss.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
+            self.data['rs' + str(averageInterval)] = self.data['averageGain' + str(averageInterval)] / self.data['averageLoss' + str(averageInterval)]
+            self.data['RSI'+ str(averageInterval)] = 100 - (100 / (1 + self.data['rs' + str(averageInterval)]))
+
+        return str(strategyName)
+
+    def makeStochRSI(self, averageInterval):
+
+        strategyType = "StochRSI"
+        strategyName = str(strategyType) + str(averageInterval)
+
+        if not self.hasStrategy(strategyType, strategyName):
+
+            RSIName = "RSI" + str(averageInterval)
+            
+            if not self.hasStrategy("RSI", RSIName):
+                self.makeRSI(averageInterval=averageInterval)
+
+            maxName = "max" + str(averageInterval)
+            minName = "min" + str(averageInterval)
+
+            self.data[maxName] = self.data[RSIName].rolling(window=averageInterval, min_periods=averageInterval).max()
+            self.data[minName] = self.data[RSIName].rolling(window=averageInterval, min_periods=averageInterval).min()
+            self.data['StochRSI' + str(averageInterval)] = (self.data[RSIName] - self.data[minName]) / (self.data[maxName] - self.data[minName])
+
+        return str(strategyName)
         
     def __str__(self) -> str:
         stringToReturn = "List of Strategy: \n\n"
