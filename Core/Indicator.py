@@ -2,7 +2,7 @@ class Indicator:
     #dataframe for data
     def __init__(self, data) -> None:
         self.data = data
-        self.strategySet = {
+        self.indicatorSet = {
             "MA": set(),
             "EMA": set(),
             "MACD": set(),
@@ -10,131 +10,177 @@ class Indicator:
             "RSI": set(),
             "StochRSI": set()
         }
+        self.relatedColumn = {}
 
     def setData(self, data):
         self.data = data
 
     def getData(self):
         return self.data
+    
+    def getIndicatorSet(self):
+        return self.indicatorSet
+    
+    def getRelatedColumn(self, indicatorName: str) -> None:
+        return self.relatedColumn[indicatorName]
+    
+    def addIndicator(self, indicatorType: str, indicatorName: str) -> None:
+        self.indicatorSet[indicatorType].add(indicatorName)
 
-    def hasStrategy(self, strategyType, strategyName: str) -> bool:
-        return strategyName in self.strategySet[strategyType] or False
+    # still need to be fixed
+    # def deleteIndicator(self, indicatorType: str, indicatorName: str) -> None:
+    #     self.indicatorSet[indicatorType].remove(indicatorName)
+    #     self.data.drop(columns=self.getRelatedColumn(indicatorName))
+
+    def hasIndicator(self, indicatorType, indicatorName: str) -> bool:
+        return indicatorName in self.indicatorSet[indicatorType] or False
 
     def makeMA(self, averageInterval: int) -> str:
 
-        strategyType = "MA"
-        strategyName = str(strategyType) + str(averageInterval)
+        indicatorType = "MA"
+        indicatorName = str(indicatorType) + str(averageInterval)
 
-        if not self.hasStrategy(strategyType, strategyName):
+        if not self.hasIndicator(indicatorType, indicatorName):
         
-            self.data[strategyName] = self.data.Close.rolling(averageInterval, adjust = False, min_periods=averageInterval).mean()
+            self.data[indicatorName] = self.data.Close.rolling(averageInterval, min_periods=averageInterval).mean()
+            self.addIndicator(indicatorType, indicatorName)
+            self.relatedColumn[indicatorName] = [indicatorName]
 
-        return str(strategyName)
+        return str(indicatorName)
 
     def makeEMA(self, averageInterval: int) -> str:
         
-        strategyType = "EMA"
-        strategyName = str(strategyType) + str(averageInterval)
+        indicatorType = "EMA"
+        indicatorName = str(indicatorType) + str(averageInterval)
 
-        if not self.hasStrategy(strategyType, strategyName):
+        if not self.hasIndicator(indicatorType, indicatorName):
 
-            self.data[strategyName] = self.data.Close.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
+            self.data[indicatorName] = self.data.Close.ewm(span=averageInterval, min_periods=averageInterval).mean()
+            self.addIndicator(indicatorType, indicatorName)
+            self.relatedColumn[indicatorName] = [indicatorName]
 
-        return str(strategyName)
+        return str(indicatorName)
 
     def makeMACD(self, firstAverageInterval: int, secondAverageInterval: int, signalAverageInterval: int) -> str|str:
 
         MACDName = "MACD(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ")"
-        signalName = "Signal(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ", " + str(signalAverageInterval) + ")" 
+        signalName = "Signal(" + str(firstAverageInterval) + ", " + str(secondAverageInterval) + ", " + str(signalAverageInterval) + ")"
 
-        if not self.hasStrategy("MACD-Signal", signalName):
+        if not self.hasIndicator("MACD-Signal", signalName):
+            self.relatedColumn[signalName] = [signalName]
 
-            if not self.hasStrategy("MACD", MACDName):
+            if not self.hasIndicator("MACD", MACDName):
+                self.relatedColumn[signalName].append(MACDName)
 
                 EMA1Name = "EMA" + str(firstAverageInterval)
                 EMA2Name = "EMA" + str(secondAverageInterval)
         
-                if not self.hasStrategy("EMA", EMA1Name):
+                if not self.hasIndicator("EMA", EMA1Name):
+                    self.relatedColumn[signalName].append(EMA1Name)
                     self.makeEMA(firstAverageInterval)
                 
-                if not self.hasStrategy("EMA", EMA2Name):
+                if not self.hasIndicator("EMA", EMA2Name):
+                    self.relatedColumn[signalName].append(EMA2Name)
                     self.makeEMA(secondAverageInterval)
 
                 self.data[MACDName] = self.data[EMA1Name] - self.data[EMA2Name]
+                self.addIndicator("MACD", MACDName)
 
-            self.data[signalName] = self.data[MACDName].ewm(span=signalAverageInterval, adjust=False, min_periods=signalAverageInterval).mean()
+            self.data[signalName] = self.data[MACDName].ewm(span=signalAverageInterval, min_periods=signalAverageInterval).mean()
+            self.addIndicator("MACD-Signal", signalName)
 
         return (signalName, MACDName)
 
     def makeRSI(self, averageInterval: int) -> None:
 
-        strategyType = "RSI"
-        strategyName = str(strategyType) + str(averageInterval)
+        indicatorType = "RSI"
+        indicatorName = str(indicatorType) + str(averageInterval)
 
-        if not self.hasStrategy(strategyType, strategyName):
+        if not self.hasIndicator(indicatorType, indicatorName):
+            self.relatedColumn[indicatorName] = [indicatorName]
 
-            # Calculate gain and loss
-            for i in range(len(self.data)):
-                if i > 0:
-                    if self.data.iloc[i]['Close'] > self.data.iloc[i-1]['Close']:
-                        self.data.at[i, 'gain'] = self.data.iloc[i]['CLose'] - self.data.iloc[i-1]['Close']
-                        self.data.at[i, 'loss'] = 0
-                    elif self.data.iloc[i]['Close'] < self.data.iloc[i-1]['Close']:
-                        self.data.at[i, 'loss'] = self.data.iloc[i-1]['Close'] - self.data.iloc[i]['Close']
-                        self.data.at[i, 'gain'] = 0
+            if "gain" not in self.data or "loss" not in self.data:
+                for i in range(1, len(self.data)):
+                    if self.data.iloc[i]["Close"] > self.data.iloc[i-1]["Close"]:
+                        self.data.loc[self.data.index[i], "gain"] = self.data.iloc[i]["Close"] - self.data.iloc[i-1]["Close"]
+                        self.data.loc[self.data.index[i], "loss"] = 0
+                    elif self.data.iloc[i]["Close"] < self.data.iloc[i-1]["Close"]:
+                        self.data.loc[self.data.index[i], "loss"] = self.data.iloc[i-1]["Close"] - self.data.iloc[i]["Close"]
+                        self.data.loc[self.data.index[i], "gain"] = 0
                     else:
-                        self.data.at[i, 'gain'] = 0
-                        self.data.at[i, 'loss'] = 0
+                        self.data.loc[self.data.index[i], "gain"] = 0
+                        self.data.loc[self.data.index[i], "loss"] = 0
+                self.relatedColumn[indicatorName].extend(["gain", "loss"])
 
-            self.data['averageGain' + str(averageInterval)] = self.data.gain.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
-            self.data['averageLoss' + str(averageInterval)] = self.data.loss.ewm(span=averageInterval, adjust=False, min_periods=averageInterval).mean()
-            self.data['rs' + str(averageInterval)] = self.data['averageGain' + str(averageInterval)] / self.data['averageLoss' + str(averageInterval)]
-            self.data['RSI'+ str(averageInterval)] = 100 - (100 / (1 + self.data['rs' + str(averageInterval)]))
+            self.data["averageGain" + str(averageInterval)] = self.data.gain.ewm(span=averageInterval, min_periods=averageInterval).mean()
+            self.data["averageLoss" + str(averageInterval)] = self.data.loss.ewm(span=averageInterval, min_periods=averageInterval).mean()
+            self.data["rs" + str(averageInterval)] = self.data["averageGain" + str(averageInterval)] / self.data["averageLoss" + str(averageInterval)]
+            self.data["RSI"+ str(averageInterval)] = 100 - (100 / (1 + self.data["rs" + str(averageInterval)]))
 
-        return str(strategyName)
+            self.relatedColumn[indicatorName].extend(["averageGain" + str(averageInterval), "averageLoss" + str(averageInterval), "rs"+ str(averageInterval)])
+
+            self.addIndicator(indicatorType, indicatorName)
+        return str(indicatorName)
 
     def makeStochRSI(self, averageInterval):
 
-        strategyType = "StochRSI"
-        strategyName = str(strategyType) + str(averageInterval)
-
-        if not self.hasStrategy(strategyType, strategyName):
+        indicatorType = "StochRSI"
+        indicatorName = str(indicatorType) + str(averageInterval)
+        if not self.hasIndicator(indicatorType, indicatorName):
+            self.relatedColumn[indicatorName] = [indicatorName]
 
             RSIName = "RSI" + str(averageInterval)
             
-            if not self.hasStrategy("RSI", RSIName):
+            if not self.hasIndicator("RSI", RSIName):
                 self.makeRSI(averageInterval=averageInterval)
+                self.relatedColumn[indicatorName].extend([RSIName, "gain", "loss", "averageGain" + str(averageInterval), "averageLoss" + str(averageInterval), "rs" + str(averageInterval)])
 
             maxName = "max" + str(averageInterval)
             minName = "min" + str(averageInterval)
 
+            self.relatedColumn[indicatorName].extend([maxName, minName])
+
             self.data[maxName] = self.data[RSIName].rolling(window=averageInterval, min_periods=averageInterval).max()
             self.data[minName] = self.data[RSIName].rolling(window=averageInterval, min_periods=averageInterval).min()
-            self.data['StochRSI' + str(averageInterval)] = (self.data[RSIName] - self.data[minName]) / (self.data[maxName] - self.data[minName])
+            self.data[indicatorName] = (self.data[RSIName] - self.data[minName]) / (self.data[maxName] - self.data[minName])
 
-        return str(strategyName)
+            self.addIndicator(indicatorType, indicatorName)
+        return str(indicatorName)
     
-    def smoothLine(self, strategyType: str, strategyName: str, smoothFactor: int):
+    def smoothLine(self, indicatorType: str, indicatorName: str, smoothFactor: int):
 
-        strategyName = str(strategyName) + "-" + str(smoothFactor)
+        indicatorName = str(indicatorName) + "-" + str(smoothFactor)
 
-        if not self.hasStrategy(strategyType, strategyName):
+        if not self.hasIndicator(indicatorType, indicatorName):
 
-            self.data[strategyName] = self.data.Close.rolling(smoothFactor, adjust = False, min_periods=smoothFactor).mean()
+            self.data[indicatorName] = self.data.Close.rolling(smoothFactor, min_periods=smoothFactor).mean()
 
-        return str(strategyName)
+        self.relatedColumn[indicatorName] = [indicatorName]
+        return str(indicatorName)
         
     def __str__(self) -> str:
-        stringToReturn = "List of Strategy: \n\n"
-        for strategyType in self.strategySet:
-            stringToReturn += str(strategyType) + " => "
-            for strategy in self.strategySet[strategyType]:
-                stringToReturn += str(strategy) + ", "
+        stringToReturn = "List of Indicator: \n\n"
+        for indicatorType in self.indicatorSet:
+            stringToReturn += str(indicatorType) + " => "
+            for indicator in self.indicatorSet[indicatorType]:
+                stringToReturn += str(indicator) + ", "
             stringToReturn += "\n"
 
         return stringToReturn
     
 if __name__ == "__main__":
-    data = "hello"
-    strategy = Indicator(data)
-    print(strategy)
+    import pandas as pd
+    import yfinance as yf
+
+    ticker_symbol = "AAPL"
+    apple_stock = yf.Ticker(ticker_symbol)
+    hist = apple_stock.history(period="1mo")
+
+    indicator = Indicator(hist)
+
+    indicator.makeMACD(2,3,4)
+    indicator.makeMACD(2,3,6)
+    print(indicator.getRelatedColumn('Signal(2, 3, 6)'))
+    print(indicator.getData())
+
+    
