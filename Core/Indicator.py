@@ -1,5 +1,4 @@
 class Indicator:
-    #dataframe for data
     def __init__(self, data) -> None:
         self.data = data
         self.indicatorSet = {
@@ -24,13 +23,24 @@ class Indicator:
     def getRelatedColumn(self, indicatorName: str) -> None:
         return self.relatedColumn[indicatorName]
     
+    def getIndicatorList(self) -> list:
+        indicatorList = []
+        for indicatorType in self.getIndicatorSet():
+            for indicator in self.getIndicatorSet()[indicatorType]:
+                indicatorList.append(indicator)
+        
+        return indicatorList
+    
     def addIndicator(self, indicatorType: str, indicatorName: str) -> None:
         self.indicatorSet[indicatorType].add(indicatorName)
 
-    # still need to be fixed
-    # def deleteIndicator(self, indicatorType: str, indicatorName: str) -> None:
-    #     self.indicatorSet[indicatorType].remove(indicatorName)
-    #     self.data.drop(columns=self.getRelatedColumn(indicatorName))
+    def remove_indicators(self, indicatorsToRemove):
+        for indicator in indicatorsToRemove:
+            for key in self.indicatorSet:
+                if indicator in self.indicatorSet[key]:
+                    self.indicatorSet[key].remove(indicator)
+                    del self.data[indicator]
+                    break
 
     def hasIndicator(self, indicatorType, indicatorName: str) -> bool:
         return indicatorName in self.indicatorSet[indicatorType] or False
@@ -179,8 +189,10 @@ if __name__ == "__main__":
     indicator = Indicator(hist)
 
     indicator.makeMACD(2,3,4)
-    indicator.makeMACD(2,3,6)
-    print(indicator.getRelatedColumn('Signal(2, 3, 6)'))
+    indicator.makeMACD(2,3,5)
+    print(indicator.getRelatedColumn('Signal(2, 3, 4)'))
+    print(indicator)
     print(indicator.getData())
-
-    
+    indicator.remove_indicators(indicator.getRelatedColumn('Signal(2, 3, 4)'))
+    print(indicator)
+    print(indicator.getData())
