@@ -9,9 +9,6 @@ import plotly.graph_objs as go
 
 st.set_page_config(layout="wide")
 
-with st.container():
-    st.write("hello")
-
 col1, col2= st.columns([1, 2])
 
 with col1:
@@ -57,15 +54,23 @@ with col1:
                     "Indicator",
                     indicatorList
                 )
-                st.write(options)
+
                 fig = go.Figure(data=[go.Candlestick(
-                    x=data.index,
-                    open=data['Open'],
-                    high=data['High'],
-                    low=data['Low'],
-                    close=data['Close'],
+                    x=st.session_state.data.index,
+                    open=st.session_state.data['Open'],
+                    high=st.session_state.data['High'],
+                    low=st.session_state.data['Low'],
+                    close=st.session_state.data['Close'],
                     name="Candlesticks",
                 )])
+
+                for indicatorName in options:
+                    fig.add_trace(go.Scatter(
+                        x=st.session_state.data.index,
+                        y=st.session_state.data[indicatorName],
+                        mode='lines',  # You can choose 'lines', 'markers', or 'lines+markers'
+                        name=indicatorName
+                    ))
 
                 fig.update_layout(
                     title="Candlestick Chart",
