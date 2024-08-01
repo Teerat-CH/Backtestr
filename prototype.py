@@ -46,6 +46,8 @@ with col1:
             if st.button("Submit"):
                 if selectedIndicator == "MA":
                     st.session_state.indicator.makeMA(averageInterval=averageInterval)
+                if selectedIndicator == "EMA":
+                    st.session_state.indicator.makeEMA(averageInterval=averageInterval)
 
 
             with col2:
@@ -56,11 +58,11 @@ with col1:
                 )
 
                 fig = go.Figure(data=[go.Candlestick(
-                    x=st.session_state.data.index,
-                    open=st.session_state.data['Open'],
-                    high=st.session_state.data['High'],
-                    low=st.session_state.data['Low'],
-                    close=st.session_state.data['Close'],
+                    x=data.index,
+                    open=data['Open'],
+                    high=data['High'],
+                    low=data['Low'],
+                    close=data['Close'],
                     name="Candlesticks",
                 )])
 
