@@ -1,6 +1,8 @@
 class Strategy:
     def __init__(self, dataframe) -> None:
         self.data = dataframe
+        self.data["Buy"] = None
+        self.data["Sell"] = None
         self.strategyList = []
 
     def setData(self, data):
@@ -10,7 +12,7 @@ class Strategy:
         return self.data
 
     def useCrossOver(self, firstLine: str, secondLine: str) -> None:
-        for i in range(len(self.data)):
+        for i in range(1, len(self.data), 1):
             if self.data[firstLine][i-1] < self.data[secondLine][i-1]:
                 if self.data[firstLine][i] > self.data[secondLine][i]:
                     currentAction = self.data["Buy"][i]

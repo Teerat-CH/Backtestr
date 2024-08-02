@@ -16,9 +16,11 @@ class Backtestr:
     def getPortfolio(self):
         return self.Portfolio
     
-    def runTest(self):
+    def runTest(self, initialFund: float, stockAmountBuy: int):
+        self.portfolio.addFund(initialFund)
         for i in range(len(self.data)):
             if self.data["Buy"][i] == True:
-                self.portfolio.buy(stockName=self.stockName, stockAmount=100, stockPrice=self.data.Open[i])
+                self.portfolio.buy(stockName=self.stockName, stockAmount=stockAmountBuy, stockPrice=self.data.Open[i])
             if self.data["Sell"][i] == True:
                 self.portfolio.sell(stockName=self.stockName, stockPrice=self.data.Open[i])
+        return self.portfolio.getNetValue()

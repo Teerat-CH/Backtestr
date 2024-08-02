@@ -43,7 +43,7 @@ with col1:
                 signalAverageInterval = st.slider("Signal Average Interval", min_value=1, max_value=100, step=1, value=9)
                 
                 
-            if st.button("Submit"):
+            if st.button("Add Indicator"):
                 if selectedIndicator == "MA":
                     st.session_state.indicator.makeMA(averageInterval=averageInterval)
                 if selectedIndicator == "EMA":
@@ -54,6 +54,38 @@ with col1:
                     st.session_state.indicator.makeRSI(averageInterval=averageInterval)
                 if selectedIndicator == "StochRSI":
                     st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
+
+            selectedStrategy = st.selectbox("Select Strategy", ("---", "Cross Over", "Boundary"))
+            indicatorList = st.session_state.indicator.getIndicatorList()
+            if selectedStrategy == "Cross Over":
+                column1, column2 = st.columns([1, 1])
+                with column1:
+                    firstLine = st.selectbox("First Line", indicatorList)
+                with column2:
+                    secondLine = st.selectbox("Second Line", indicatorList)
+            if selectedStrategy == "Boundary":
+                column1, column2, column3 = st.columns([0.75, 1.5, 0.75])
+                with column1:
+                    lowerBoundary = st.number_input("Lower Boundary", value=0.2)
+                with column2:
+                    line = st.selectbox("indicator", indicatorList)
+                with column3:
+                    upperBoundary = st.number_input("Upper Boundary", value=0.8)
+
+
+            if st.button("Add Strategy"):
+                if selectedStrategy == "Cross Over":
+                    st.session_state.strategy.useCrossOver(firstLine=firstLine, secondLine=secondLine)
+                if selectedStrategy == "Boundary":
+                    st.session_state.strategy.useUpperLowerBoundary(line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+
+            initialFund = st.number_input("Initial Fund", value=100000)
+            stockAmountBuy = st.number_input("Number of stock per action", value=100)
+
+            if st.button("Run Test", type="primary"):
+                netValue = st.session_state.backtestr.runTest(initialFund, stockAmountBuy)
+                st.write(netValue)
+            
 
 
             with col2:
