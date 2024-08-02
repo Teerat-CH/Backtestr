@@ -126,6 +126,7 @@ class Indicator:
             self.data["averageLoss" + str(averageInterval)] = self.data.loss.ewm(span=averageInterval, min_periods=averageInterval).mean()
             self.data["rs" + str(averageInterval)] = self.data["averageGain" + str(averageInterval)] / self.data["averageLoss" + str(averageInterval)]
             self.data["RSI"+ str(averageInterval)] = 100 - (100 / (1 + self.data["rs" + str(averageInterval)]))
+            self.data["RSI"+ str(averageInterval)] = self.data["RSI"+ str(averageInterval)] / 100
 
             self.relatedColumn[indicatorName].extend(["averageGain" + str(averageInterval), "averageLoss" + str(averageInterval), "rs"+ str(averageInterval)])
 
