@@ -6,6 +6,7 @@ from Core.Strategy import Strategy
 class Backtestr:
     def __init__(self, data, stockName) -> None:
         self.data = data
+        self.data["netValue"] = 0
         self.portfolio = Portfolio()
 
         self.stockName = stockName
@@ -23,4 +24,5 @@ class Backtestr:
                 self.portfolio.buy(stockName=self.stockName, stockAmount=stockAmountBuy, stockPrice=self.data.Open[i])
             if self.data["Sell"][i] == True:
                 self.portfolio.sell(stockName=self.stockName, stockPrice=self.data.Open[i])
+            self.data["netValue"][i] = self.portfolio.getNetValue()            
         return self.portfolio.getNetValue()
