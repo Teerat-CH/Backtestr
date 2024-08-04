@@ -41,7 +41,7 @@ with col1:
         st.session_state.strategy = strategy
 
     if "data" in st.session_state:
-        with st.container(border=True):
+        with st.popover("Add Indicator", use_container_width=True):
             selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI"), key="input_indicator")
             if selectedIndicator in ["MA", "EMA", "RSI", "StochRSI"]:
                 averageInterval = st.slider("Average Interval", min_value=1, max_value=100, step=1, value=20)
@@ -63,7 +63,7 @@ with col1:
                 if selectedIndicator == "StochRSI":
                     st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
 
-        with st.container(border=True):
+        with st.popover("Add Strategy", use_container_width=True):
             selectedStrategy = st.selectbox("Select Strategy", ("---", "Cross Over", "Boundary"))
             indicatorList = st.session_state.indicator.getIndicatorList()
             if selectedStrategy == "Cross Over":
@@ -85,11 +85,14 @@ with col1:
                     st.session_state.strategy.useCrossOver(firstLine=firstLine, secondLine=secondLine)
                 if selectedStrategy == "Boundary":
                     st.session_state.strategy.useUpperLowerBoundary(line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+        
+        with st.container(height=100):
+            st.write(st.session_state.strategy.getStrategyList())
 
         with col2:
             indicatorList = st.session_state.indicator.getIndicatorList()
             options = st.multiselect(
-                "Indicator",
+                "Show Indicator(s)",
                 indicatorList
             )
 
@@ -169,6 +172,8 @@ with col1:
                         netValue = st.session_state.backtestr.runTest(initialFund, stockAmountBuy)
                         st.write(netValue)
 
+                        st.write(st.session_state.data)
+
                         buy_signals = st.session_state.data[st.session_state.data['Buy'] == True]
                         sell_signals = st.session_state.data[st.session_state.data['Sell'] == True]
 
@@ -190,9 +195,18 @@ with col1:
                         netValueChart = go.Figure(data=go.Scatter(
                                             x=st.session_state.data.index,
                                             y=st.session_state.data.netValue,
-                                            mode='lines+markers',
+                                            mode='lines',
                                             name='Net Value'
                                         ))
+                        netValueChart.update_layout(
+                            yaxis_title='Net Value',
+                            xaxis_rangeslider_visible=False,
+                            height=250,
+                            margin={
+                                "b": 0,
+                                "t": 0
+                            }
+                        )
                         st.write(netValueChart)
             with st.container(border=True, height=1000):
                 with st.container(border=True):

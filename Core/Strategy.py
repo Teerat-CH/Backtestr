@@ -1,50 +1,51 @@
 class Strategy:
     def __init__(self, dataframe) -> None:
         self.data = dataframe
-        self.data["Buy"] = None
-        self.data["Sell"] = None
-        self.strategyList = []
+        self.data["Buy"] = True
+        self.data["Sell"] = True
+        self.strategyList = {
+            "Buy" : [],
+            "Sell" : []
+        }
 
     def setData(self, data):
         self.data = data
     
     def getData(self):
         return self.data
+    
+    def getStrategyList(self):
+        return self.strategyList
 
     def useCrossOver(self, firstLine: str, secondLine: str) -> None:
-        for i in range(1, len(self.data), 1):
-            if self.data[firstLine][i-1] < self.data[secondLine][i-1]:
-                if self.data[firstLine][i] > self.data[secondLine][i]:
-                    currentAction = self.data["Buy"][i]
-                    newAction = True
-                    if currentAction != None:
-                        newAction = currentAction and newAction
-                    self.data["Buy"][i] = newAction
+        for i in range(1, len(self.data)-1, 1):
+            if (self.data[firstLine][i-1] < self.data[secondLine][i-1]) and (self.data[firstLine][i] > self.data[secondLine][i]):
+                self.data["Buy"][i] = self.data["Buy"][i] and True
+            else:
+                self.data["Buy"][i] = False
 
-            if self.data[firstLine][i-1] > self.data[secondLine][i-1]:
-                if self.data[firstLine][i] < self.data[secondLine][i]:
-                    currentAction = self.data["Sell"][i]
-                    newAction = True
-                    if currentAction != None:
-                        newAction = currentAction and newAction
-                    self.data["Sell"][i] = newAction
-        self.strategyList.append("Cross Over")
+            if (self.data[firstLine][i-1] > self.data[secondLine][i-1]) and (self.data[firstLine][i] < self.data[secondLine][i]):
+                self.data["Sell"][i] = self.data["Sell"][i] and True
+            else:
+                self.data["Sell"][i] = False
+
+        self.strategyList["Buy"].append(firstLine + " cross up " + secondLine)
+        self.strategyList["Sell"].append(firstLine + " cross down " + secondLine)
     
     def useUpperLowerBoundary(self, line: str, upperBoundary: float, lowerBoundary: float) -> None:
-        for i in range(len(self.data)):
+        for i in range(1, len(self.data), 1):
             if self.data[line][i-1] < lowerBoundary:
-                currentAction = self.data["Buy"][i]
-                newAction = True
-                if currentAction != None:
-                    newAction = currentAction and newAction
-                self.data["Buy"][i] = newAction
+                self.data["Buy"][i] = self.data["Buy"][i] and True
+            else:
+                self.data["Buy"][i] = False
             
             if self.data[line][i-1] > upperBoundary:
-                currentAction = self.data["Buy"][i]
-                newAction = True
-                if currentAction != None:
-                    newAction = currentAction and newAction
-                self.data["Sell"][i] = newAction
+                self.data["Sell"][i] = self.data["Sell"][i] and True
+            else:
+                self.data["Sell"][i] = False
+                
+        self.strategyList["Buy"].append(line + " below " + str(lowerBoundary))
+        self.strategyList["Sell"].append(line + " above " + str(upperBoundary))
 
 if __name__ == "__main__":
     pass
