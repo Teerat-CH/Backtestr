@@ -18,16 +18,16 @@ with dataTab:
     with dataTab_col1:
         st.write("##### 1. Select and Download Stock Data")
         with st.container(border=True):
-            stockCol, periodCol, intervalCol, downloadCol = st.columns([2, 1, 1, 1])
+            stockCol, periodCol, intervalCol, downloadCol = st.columns([2, 1.5, 1.5, 1])
             with stockCol:
-                stockName = st.selectbox("Select Stock", ("---", "ADVANC", "AOT", "AWC", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC", "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"))
+                stockName = st.selectbox("Stock", ("---", "ADVANC", "AOT", "AWC", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC", "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"))
             with periodCol:
-                period = st.selectbox("Select Period", ("---", "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"))
+                period = st.selectbox("Period", ("---", "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"))
             with intervalCol:    
-                interval = st.selectbox("Select Interval", ("---", "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1d", "5d", "1wk", "1mo"))
+                interval = st.selectbox("Interval", ("---", "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1d", "5d", "1wk", "1mo"))
             with downloadCol:
                 st.write("######")
-                downloadButton = st.button("Download", type="primary")
+                downloadButton = st.button(" 📥 ")
 
         if stockName != "---" and period != "---" and interval != "---":
             ticker_symbol = stockName + ".bk"
@@ -50,13 +50,15 @@ with dataTab:
             st.write("##### 2. Add indicator(s)")
             st.write("- Added indicator(s) can be plotted in the Chart Tab")
             with st.container(border=True):
-                selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator"), key="input_indicator")
+                selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator", "LinearLine"), key="input_indicator")
                 if selectedIndicator in ["MA", "EMA", "RSI", "StochRSI", "StochOscillator"]:
-                    averageInterval = st.slider("Average Interval", min_value=1, max_value=100, step=1, value=20)
+                    averageInterval = st.slider("Average Interval", min_value=0, max_value=100, step=1, value=20)
                 if selectedIndicator in ["MACD"]:
                     firstAverageInterval = st.slider("First Average Interval", min_value=1, max_value=100, step=1, value=12)
                     secondAverageInterval = st.slider("Second Average Interval", min_value=1, max_value=100, step=1, value=26)
                     signalAverageInterval = st.slider("Signal Average Interval", min_value=1, max_value=100, step=1, value=9)
+                if selectedIndicator in ["LinearLine"]:
+                    value = st.slider("Value", min_value=0.0, max_value=1.0, step=0.01, value=0.5)
                     
                 if st.button("Add Indicator"):
                     if selectedIndicator == "MA":
@@ -71,6 +73,8 @@ with dataTab:
                         st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
                     if selectedIndicator == "StochOscillator":
                         st.session_state.indicator.makeStochOscillator(averageInterval=averageInterval)
+                    if selectedIndicator == "LinearLine":
+                        st.session_state.indicator.makeLinearLine(value)
             
                 st.write(st.session_state.indicator)
 
@@ -140,6 +144,13 @@ with dataTab:
                         mode='lines',
                         name=indicatorName
                     ))
+                elif "LinearLine" in indicatorName:
+                    RSIChart.add_trace(go.Scatter(
+                        x=st.session_state.data.index,
+                        y=st.session_state.data[indicatorName],
+                        mode='lines',
+                        name=indicatorName
+                    ))
 
             mainChart.update_layout(
                 xaxis_title='Date',
@@ -176,6 +187,15 @@ with dataTab:
                 with dataTab_col3:
                     st.write("##### 4. Run the Back Test!")
                     netValueChart = go.Figure()
+                    netValueChart.update_layout(
+                                yaxis_title='Net Value',
+                                xaxis_rangeslider_visible=False,
+                                height=250,
+                                margin={
+                                    "b": 0,
+                                    "t": 0
+                                }
+                            )
                     with st.container(border=True):
                         initialFund = st.number_input("Initial Fund", value=100000)
                         stockAmountBuy = st.number_input("Number of stock per position", value=100)
@@ -210,15 +230,6 @@ with dataTab:
                                                 mode='lines',
                                                 name='Net Value'
                                             ))
-                            netValueChart.update_layout(
-                                yaxis_title='Net Value',
-                                xaxis_rangeslider_visible=False,
-                                height=250,
-                                margin={
-                                    "b": 0,
-                                    "t": 0
-                                }
-                            )
                         st.write(netValueChart)
             with st.container(border=True):
                 st.write(mainChart)
@@ -226,8 +237,6 @@ with dataTab:
                 st.write(MACDChart)
             with st.container(border=True):
                 st.write(RSIChart)
-
-
 
 with featureRequestTab:
     featureRequestTab_col1, featureRequestTab_col2, featureRequestTab_col3 = st.columns([1,1,1])

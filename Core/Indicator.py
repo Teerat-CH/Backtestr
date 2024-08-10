@@ -8,7 +8,8 @@ class Indicator:
             "MACD-Signal": set(),
             "RSI": set(),
             "StochRSI": set(),
-            "StochOscillator": set()
+            "StochOscillator": set(),
+            "LinearLine": set()
         }
         self.relatedColumn = {}
 
@@ -174,6 +175,20 @@ class Indicator:
 
             self.addIndicator(indicatorType, indicatorName)
             
+            return str(indicatorName)
+        
+    def makeLinearLine(self, value: int):
+        
+        indicatorType = "LinearLine"
+        indicatorName = "LinearLine" + str(value)
+
+        if not self.hasIndicator(indicatorType, indicatorName):
+            self.relatedColumn[indicatorName] = [indicatorName]
+
+            self.data[indicatorName] = value
+
+            self.addIndicator(indicatorType, indicatorName)
+
             return str(indicatorName)
     
     def smoothLine(self, indicatorName: str, smoothFactor: int):
