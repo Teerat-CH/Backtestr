@@ -9,13 +9,14 @@ import plotly.graph_objs as go
 
 st.set_page_config(layout="wide")
 
-st.header("Backtestr Prototype")
+st.title("Backtestr")
 
 dataTab, graphTab, searchTab, docTab, featureRequestTab = st.tabs(["🗃 Data", "📈 Chart", "🔎 Stock Search", "📄 Documentation", "💡 Feature Request"])
 
 with dataTab:
     dataTab_col1, dataTab_col2, dataTab_col3 = st.columns([1, 1, 1])
     with dataTab_col1:
+        st.write("##### 1. Select and Download Stock Data")
         with st.container(border=True):
             stockCol, periodCol, intervalCol, downloadCol = st.columns([2, 1, 1, 1])
             with stockCol:
@@ -46,7 +47,9 @@ with dataTab:
     if "data" in st.session_state:
         with dataTab_col2:
 
-            with st.popover("Add Indicator", use_container_width=True):
+            st.write("##### 2. Add indicator(s)")
+            st.write("- Added indicator(s) can be plotted in the Chart Tab")
+            with st.container(border=True):
                 selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator"), key="input_indicator")
                 if selectedIndicator in ["MA", "EMA", "RSI", "StochRSI", "StochOscillator"]:
                     averageInterval = st.slider("Average Interval", min_value=1, max_value=100, step=1, value=20)
@@ -69,10 +72,10 @@ with dataTab:
                     if selectedIndicator == "StochOscillator":
                         st.session_state.indicator.makeStochOscillator(averageInterval=averageInterval)
             
-            with st.container(border=True):
                 st.write(st.session_state.indicator)
 
-            with st.popover("Add Strategy", use_container_width=True):
+            st.write("##### 3. Add Buy and Sell Strategy")
+            with st.container(border=True):
                 selectedStrategy = st.selectbox("Select Strategy", ("---", "Cross Over", "Boundary"))
                 indicatorList = st.session_state.indicator.getIndicatorList()
                 if selectedStrategy == "Cross Over":
@@ -95,13 +98,12 @@ with dataTab:
                     if selectedStrategy == "Boundary":
                         st.session_state.strategy.useUpperLowerBoundary(line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
             
-            with st.container(border=True):
                 st.write(st.session_state.strategy.getStrategyList())
 
         with graphTab:
             indicatorList = st.session_state.indicator.getIndicatorList()
             options = st.multiselect(
-                "Show Indicator(s)",
+                "##### Show Indicator(s)",
                 indicatorList
             )
 
@@ -172,6 +174,7 @@ with dataTab:
 
             with dataTab:
                 with dataTab_col3:
+                    st.write("##### 4. Run the Back Test!")
                     netValueChart = go.Figure()
                     with st.container(border=True):
                         initialFund = st.number_input("Initial Fund", value=100000)
@@ -227,23 +230,14 @@ with dataTab:
 
 
 with featureRequestTab:
-    with st.container():
-        st.markdown("""
-            <style>
-            .stApp {
-                max-width: 800px;
-                margin: auto;
-                padding: 2rem;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+    featureRequestTab_col1, featureRequestTab_col2, featureRequestTab_col3 = st.columns([1,1,1])
+    with featureRequestTab_col2:
         with st.form(key='feature_request_form'):
+            st.subheader('Feature Request Form')
             # Collect user inputs
             name = st.text_input('Name')
             email = st.text_input('Email')
-            
-            # Type of request with checkboxes
-            st.subheader('Type of Request')
+        
             new_feature = st.checkbox('New Feature')
             improvement = st.checkbox('Improvement')
             bug_report = st.checkbox('Bug Report')
