@@ -7,7 +7,8 @@ class Indicator:
             "MACD": set(),
             "MACD-Signal": set(),
             "RSI": set(),
-            "StochRSI": set()
+            "StochRSI": set(),
+            "StochOscillator": set()
         }
         self.relatedColumn = {}
 
@@ -158,24 +159,41 @@ class Indicator:
             self.addIndicator(indicatorType, indicatorName)
         return str(indicatorName)
     
-    def smoothLine(self, indicatorType: str, indicatorName: str, smoothFactor: int):
-
-        indicatorName = str(indicatorName) + "-" + str(smoothFactor)
-
+    def makeStochOscillator(self, averageInterval):
+        indicatorType = "StochOscillator"
+        indicatorName = "StochOscillator" + str(averageInterval)
         if not self.hasIndicator(indicatorType, indicatorName):
+            highName = "high" + str(averageInterval)
+            lowName = "low" + str(averageInterval)
+            self.relatedColumn[indicatorName] = [indicatorName, highName, lowName]
 
-            self.data[indicatorName] = self.data.Close.rolling(smoothFactor, min_periods=smoothFactor).mean()
+            self.data[highName] = self.data.Close.rolling(window=averageInterval, min_periods=averageInterval).max()
+            self.data[lowName] = self.data.Close.rolling(window=averageInterval, min_periods=averageInterval).min()
+            self.data[indicatorName] = ((self.data["Close"] - self.data[lowName]) / (self.data[highName] - self.data[lowName])) * 100
+            self.data[indicatorName] = self.data[indicatorName].rolling(10, min_periods=10).mean()
 
-        self.relatedColumn[indicatorName] = [indicatorName]
-        return str(indicatorName)
+            self.addIndicator(indicatorType, indicatorName)
+            
+            return str(indicatorName)
+    
+    def smoothLine(self, indicatorName: str, smoothFactor: int):
+
+        newIndicatorName = str(indicatorName) + "-" + str(smoothFactor)
+
+        self.data[newIndicatorName] = self.data[indicatorName].rolling(smoothFactor, min_periods=smoothFactor).mean()
+
+        self.relatedColumn[newIndicatorName] = [newIndicatorName]
+        self.addIndicator(indicatorType="StochOscillator", indicatorName=newIndicatorName)
+        return str(newIndicatorName)
         
     def __str__(self) -> str:
         stringToReturn = "List of Indicator: \n\n"
         for indicatorType in self.indicatorSet:
-            stringToReturn += str(indicatorType) + " => "
-            for indicator in self.indicatorSet[indicatorType]:
-                stringToReturn += str(indicator) + ", "
-            stringToReturn += "\n"
+            if len(self.indicatorSet[indicatorType]) != 0:
+                stringToReturn += str(indicatorType) + " => "
+                for indicator in self.indicatorSet[indicatorType]:
+                    stringToReturn += str(indicator) + ", "
+                stringToReturn += "\n"
 
         return stringToReturn
     
