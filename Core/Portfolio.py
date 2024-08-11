@@ -21,7 +21,7 @@ class Portfolio:
             return True
         return False
 
-    def sell(self, stockName: str, stockPrice: float) -> bool:
+    def sell(self, stockName: str, stockAmount: int, stockPrice: float) -> bool:
         if (stockName in self.stockDirectory):
                 stockTracker = self.stockDirectory[stockName]
                 if stockTracker.getStockAmount() > 0:

@@ -23,6 +23,6 @@ class Backtestr:
             if self.data["Buy"][i] == True:
                 self.portfolio.buy(stockName=self.stockName, stockAmount=stockAmountBuy, stockPrice=self.data.Open[i])
             if self.data["Sell"][i] == True:
-                self.portfolio.sell(stockName=self.stockName, stockPrice=self.data.Open[i])
+                self.portfolio.sell(stockName=self.stockName, stockAmount=self.portfolio.getStockAmount(self.stockName), stockPrice=self.data.Open[i])
             self.data["netValue"][i] = self.portfolio.getNetValue()            
         return self.portfolio.getNetValue()
