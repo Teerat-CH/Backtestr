@@ -114,7 +114,10 @@ with dataTab:
                         st.session_state.strategy.useCrossOver(action="sell", logic=andOr, firstLine=firstLine, secondLine=secondLine)
                     if selectedStrategy == "Boundary":
                         st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
-            
+
+                if st.button("Clear Strategy"):
+                    st.session_state.strategy.clearStrategy()
+                    
                 st.write(st.session_state.strategy.getStrategyList())
 
         with graphTab:
