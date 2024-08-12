@@ -16,6 +16,14 @@ class Strategy:
     
     def getStrategyList(self):
         return self.strategyList
+    
+    def clearStrategy(self) -> None:
+        self.data["Buy"] = None
+        self.data["Sell"] = None
+        self.strategyList = {
+            "Buy" : [],
+            "Sell" : []
+        }
 
     def useCrossOver(self, action: str, logic: bool, firstLine: str, secondLine: str) -> None:
         if action == "buy":
