@@ -96,11 +96,24 @@ with dataTab:
                         line = st.selectbox("indicator", indicatorList)
                     with column3:
                         upperBoundary = st.number_input("Upper Boundary", value=0.8)
-                if st.button("Add Strategy"):
+
+                andOr = st.toggle("And/Or", value=False)
+                if andOr:
+                    st.write(f"Use **AND**")
+                else:
+                    st.write(f"Use **OR**")
+
+                if st.button("Add Buy Strategy"):
                     if selectedStrategy == "Cross Over":
-                        st.session_state.strategy.useCrossOver(firstLine=firstLine, secondLine=secondLine)
+                        st.session_state.strategy.useCrossOver(action="buy", logic=andOr, firstLine=firstLine, secondLine=secondLine)
                     if selectedStrategy == "Boundary":
-                        st.session_state.strategy.useUpperLowerBoundary(line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+                        st.session_state.strategy.useUpperLowerBoundary(action="buy", logic=andOr, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+
+                if st.button("Add Sell Strategy"):
+                    if selectedStrategy == "Cross Over":
+                        st.session_state.strategy.useCrossOver(action="sell", logic=andOr, firstLine=firstLine, secondLine=secondLine)
+                    if selectedStrategy == "Boundary":
+                        st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
             
                 st.write(st.session_state.strategy.getStrategyList())
 

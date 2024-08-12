@@ -171,7 +171,7 @@ class Indicator:
             self.data[highName] = self.data.Close.rolling(window=averageInterval, min_periods=averageInterval).max()
             self.data[lowName] = self.data.Close.rolling(window=averageInterval, min_periods=averageInterval).min()
             self.data[indicatorName] = ((self.data["Close"] - self.data[lowName]) / (self.data[highName] - self.data[lowName])) * 100
-            self.data[indicatorName] = self.data[indicatorName].rolling(10, min_periods=10).mean()
+            self.data[indicatorName] = self.data[indicatorName].rolling(10, min_periods=10).mean()/100
 
             self.addIndicator(indicatorType, indicatorName)
             
