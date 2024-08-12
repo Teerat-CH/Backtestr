@@ -251,6 +251,35 @@ with dataTab:
             with st.container(border=True):
                 st.write(RSIChart)
 
+with searchTab:
+    stockList = []
+    searchOption = st.selectbox("Search From", ["SET50"])
+    period = st.selectbox("Period", ("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"))
+    interval = st.selectbox("Interval", ("1m", "2m", "5m", "15m", "30m", "60m", "90m", "1d", "5d", "1wk", "1mo"))
+
+    SET50 = ["ADVANC", "AOT", "AWC", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC", "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
+    
+    import time
+
+    progress_text = "Operation in progress. Please wait."
+    if st.button("Search"):
+        my_bar = st.progress(0, text=progress_text)
+        i = 0
+        step = int(100/len(SET50))
+        for stock in SET50:
+            i+=step
+            time.sleep(0.01)
+            my_bar.progress(i, text=progress_text)
+            if stock != "---":
+                ticker_symbol = stock + ".bk"
+                stockTicker = yf.Ticker(ticker_symbol)
+                data = stockTicker.history(period=period, interval=interval).reset_index(drop=True)
+                stockList.append(stock)
+        st.write(stockList)
+        if i >= 100:
+            my_bar.progress(i, text="Search Completed")
+
+
 with featureRequestTab:
     featureRequestTab_col1, featureRequestTab_col2, featureRequestTab_col3 = st.columns([1,1,1])
     with featureRequestTab_col2:
