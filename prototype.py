@@ -106,22 +106,25 @@ with dataTab:
                 else:
                     st.write(f"Use **OR**")
 
+                terminate = st.toggle("Terminate", value = False)
+
                 if st.button("Add Buy Strategy"):
                     if selectedStrategy == "Cross Over":
-                        st.session_state.strategy.useCrossOver(action="buy", logic=andOr, firstLine=firstLine, secondLine=secondLine)
+                        st.session_state.strategy.useCrossOver(action="buy", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
                     if selectedStrategy == "Boundary":
-                        st.session_state.strategy.useUpperLowerBoundary(action="buy", logic=andOr, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+                        st.session_state.strategy.useUpperLowerBoundary(action="buy", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
 
                 if st.button("Add Sell Strategy"):
                     if selectedStrategy == "Cross Over":
-                        st.session_state.strategy.useCrossOver(action="sell", logic=andOr, firstLine=firstLine, secondLine=secondLine)
+                        st.session_state.strategy.useCrossOver(action="sell", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
                     if selectedStrategy == "Boundary":
-                        st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+                        st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
 
                 if st.button("Clear Strategy"):
                     st.session_state.strategy.clearStrategy()
                     
                 st.write(st.session_state.strategy.getStrategyList())
+                st.write(st.session_state.data)
 
         with graphTab:
             indicatorList = st.session_state.indicator.getIndicatorList()
