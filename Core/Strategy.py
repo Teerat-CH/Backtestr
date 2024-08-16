@@ -3,6 +3,7 @@ class Strategy:
         self.data = dataframe
         self.data["Buy"] = None
         self.data["Sell"] = None
+        self.data["Terminate"] = False
         self.strategyList = {
             "Buy" : [],
             "Sell" : []
@@ -25,7 +26,7 @@ class Strategy:
             "Sell" : []
         }
 
-    def useCrossOver(self, action: str, logic: bool, firstLine: str, secondLine: str) -> None:
+    def useCrossOver(self, action: str, logic: bool, firstLine: str, secondLine: str, terminate: bool) -> None:
         if action == "buy":
             for i in range(1, len(self.data)-1, 1):
                 if (self.data.loc[i-1, firstLine] < self.data.loc[i-1, secondLine]) and (self.data.loc[i, firstLine] > self.data.loc[i, secondLine]):
@@ -56,6 +57,7 @@ class Strategy:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] and True
                         else:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] or True
+                    self.data.loc[i+1, "Terminate"] = terminate
                 else:
                     if self.data.loc[i+1, "Sell"] == None:
                         self.data.loc[i+1, "Sell"] = False
@@ -64,9 +66,9 @@ class Strategy:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] and False
                         else:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] or False
-            self.strategyList["Sell"].append(firstLine + " cross down " + secondLine)
+            self.strategyList["Sell"].append(firstLine + " cross down " + secondLine + " - Terminate = " + str(terminate))
     
-    def useUpperLowerBoundary(self, action: str, logic: bool, line: str, upperBoundary: float, lowerBoundary: float) -> None:
+    def useUpperLowerBoundary(self, action: str, logic: bool, line: str, upperBoundary: float, lowerBoundary: float, terminate: bool) -> None:
         if action == "buy":
             for i in range(1, len(self.data), 1):
                 if self.data.loc[i-1, line] < lowerBoundary:
@@ -97,6 +99,7 @@ class Strategy:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] and True
                         else:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] or True
+                    self.data.loc[i+1, "Terminate"] = terminate
                 else:
                     if self.data.loc[i+1, "Sell"] == None:
                         self.data.loc[i+1, "Sell"] = False
@@ -105,7 +108,7 @@ class Strategy:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] and False
                         else:
                             self.data.loc[i+1, "Sell"] = self.data.loc[i+1, "Sell"] or False
-            self.strategyList["Sell"].append(line + " above " + str(upperBoundary))
+            self.strategyList["Sell"].append(line + " above " + str(upperBoundary) + " - Terminate = " + str(terminate))
 
 if __name__ == "__main__":
     pass

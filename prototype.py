@@ -217,12 +217,13 @@ with dataTab:
                             )
                     with st.container(border=True):
                         initialFund = st.number_input("Initial Fund", value=100000)
-                        stockAmountBuy = st.number_input("Number of stock per position", value=100)
+                        stockAmountBuy = st.number_input("Number of stock per position Buy", value=100)
+                        stockAmountSell = st.number_input("Number of stock per position Sell", value=100)
                         if st.button("Run Test", type="primary"):
                             backtestr = Backtestr(st.session_state.data, ticker_symbol)
                             st.session_state.backtestr = backtestr
 
-                            netValue = st.session_state.backtestr.runTest(initialFund, stockAmountBuy)
+                            netValue = st.session_state.backtestr.runTest(initialFund, stockAmountBuy, stockAmountSell)
                             st.write(netValue)
 
                             buy_signals = st.session_state.data[st.session_state.data['Buy'] == True]
