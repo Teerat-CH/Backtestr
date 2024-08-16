@@ -3,6 +3,8 @@ from Core.Portfolio import Portfolio
 from Core.Indicator import Indicator
 from Core.Strategy import Strategy
 
+import numpy as np
+
 class Backtestr:
     def __init__(self, data, stockName) -> None:
         self.data = data
@@ -20,9 +22,10 @@ class Backtestr:
     def runTest(self, initialFund: float, stockAmountBuy: int):
         self.portfolio.addFund(initialFund)
         for i in range(len(self.data)):
-            if self.data["Buy"][i] == True:
+            if self.data.loc[i, "Buy"] == True:
                 self.portfolio.buy(stockName=self.stockName, stockAmount=stockAmountBuy, stockPrice=self.data.Open[i])
-            if self.data["Sell"][i] == True:
+            if self.data.loc[i, "Sell"] == True:
                 self.portfolio.sell(stockName=self.stockName, stockAmount=self.portfolio.getStockAmount(self.stockName), stockPrice=self.data.Open[i])
-            self.data["netValue"][i] = self.portfolio.getNetValue()            
+            self.data["netValue"] = self.data["netValue"].astype(float)
+            self.data.loc[i, "netValue"] = self.portfolio.getNetValue()         
         return self.portfolio.getNetValue()

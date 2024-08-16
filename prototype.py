@@ -20,7 +20,7 @@ with dataTab:
         with st.container(border=True):
             stockCol, periodCol, intervalCol, downloadCol = st.columns([2, 1.5, 1.5, 1])
             with stockCol:
-                stockName = st.selectbox("Stock", ("---", "ADVANC", "AOT", "AWC", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC", "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"))
+                stockName = st.selectbox("Stock", ("---", "BTC-USD", "ADVANC", "AOT", "AWC", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC", "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"))
             with periodCol:
                 period = st.selectbox("Period", ("---", "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"))
             with intervalCol:    
@@ -30,7 +30,10 @@ with dataTab:
                 downloadButton = st.button(" 📥 ")
 
         if stockName != "---" and period != "---" and interval != "---":
-            ticker_symbol = stockName + ".bk"
+            if stockName != "BTC-USD":
+                ticker_symbol = stockName + ".bk"
+            else:
+                ticker_symbol = stockName
             stock = yf.Ticker(ticker_symbol)
             data = stock.history(period=period, interval=interval).reset_index(drop=True)
 

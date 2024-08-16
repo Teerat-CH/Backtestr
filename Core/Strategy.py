@@ -28,83 +28,83 @@ class Strategy:
     def useCrossOver(self, action: str, logic: bool, firstLine: str, secondLine: str) -> None:
         if action == "buy":
             for i in range(1, len(self.data)-1, 1):
-                if (self.data[firstLine][i-1] < self.data[secondLine][i-1]) and (self.data[firstLine][i] > self.data[secondLine][i]):
-                    if self.data["Buy"][i] == None:
-                        self.data["Buy"][i] = True
+                if (self.data.loc[i-1, firstLine] < self.data.loc[i-1, secondLine]) and (self.data.loc[i, firstLine] > self.data.loc[i, secondLine]):
+                    if self.data.loc[i, "Buy"] == None:
+                        self.data.loc[i, "Buy"] = True
                     else:
                         if logic:
-                            self.data["Buy"][i] = self.data["Buy"][i] and True
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] and True
                         else:
-                            self.data["Buy"][i] = self.data["Buy"][i] or True
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] or True
                 else:
-                    if self.data["Buy"][i] == None:
-                        self.data["Buy"][i] = False
+                    if self.data.loc[i, "Buy"] == None:
+                        self.data.loc[i, "Buy"] = False
                     else:
                         if logic:
-                            self.data["Buy"][i] = self.data["Buy"][i] and False
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] and False
                         else:
-                            self.data["Buy"][i] = self.data["Buy"][i] or False
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] or False
             self.strategyList["Buy"].append(firstLine + " cross up " + secondLine)
         
         if action == "sell":
             for i in range(1, len(self.data)-1, 1):
-                if (self.data[firstLine][i-1] > self.data[secondLine][i-1]) and (self.data[firstLine][i] < self.data[secondLine][i]):
-                    if self.data["Sell"][i] == None:
-                        self.data["Sell"][i] = True
+                if (self.data.loc[i-1, firstLine] > self.data.loc[i-1, secondLine]) and (self.data.loc[i, firstLine] < self.data.loc[i, secondLine]):
+                    if self.data.loc[i, "Sell"] == None:
+                        self.data.loc[i, "Sell"] = True
                     else:
                         if logic:
-                            self.data["Sell"][i] = self.data["Sell"][i] and True
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] and True
                         else:
-                            self.data["Sell"][i] = self.data["Sell"][i] or True
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] or True
                 else:
-                    if self.data["Sell"][i] == None:
-                        self.data["Sell"][i] = False
+                    if self.data.loc[i, "Sell"] == None:
+                        self.data.loc[i, "Sell"] = False
                     else:
                         if logic:
-                            self.data["Sell"][i] = self.data["Sell"][i] and False
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] and False
                         else:
-                            self.data["Sell"][i] = self.data["Sell"][i] or False
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] or False
             self.strategyList["Sell"].append(firstLine + " cross down " + secondLine)
     
     def useUpperLowerBoundary(self, action: str, logic: bool, line: str, upperBoundary: float, lowerBoundary: float) -> None:
         if action == "buy":
             for i in range(1, len(self.data), 1):
-                if self.data[line][i-1] < lowerBoundary:
-                    if self.data["Buy"][i] == None:
-                        self.data["Buy"][i] = True
+                if self.data.loc[i-1, line] < lowerBoundary:
+                    if self.data.loc[i, "Buy"] == None:
+                        self.data.loc[i, "Buy"] = True
                     else:
                         if logic == True:
-                            self.data["Buy"][i] = self.data["Buy"][i] and True
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] and True
                         else:
-                            self.data["Buy"][i] = self.data["Buy"][i] or True
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] or True
                 else:
-                    if self.data["Buy"][i] == None:
-                        self.data["Buy"][i] = False
+                    if self.data.loc[i, "Buy"] == None:
+                        self.data.loc[i, "Buy"] = False
                     else:
                         if logic == True:
-                            self.data["Buy"][i] = self.data["Buy"][i] and False
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] and False
                         else:
-                            self.data["Buy"][i] = self.data["Buy"][i] or False
+                            self.data.loc[i, "Buy"] = self.data.loc[i, "Buy"] or False
             self.strategyList["Buy"].append(line + " below " + str(lowerBoundary))
             
         if action == "sell":
             for i in range(1, len(self.data), 1):
-                if self.data[line][i-1] > upperBoundary:
-                    if self.data["Sell"][i] == None:
-                        self.data["Sell"][i] = True
+                if self.data.loc[i-1, line] > upperBoundary:
+                    if self.data.loc[i, "Sell"] == None:
+                        self.data.loc[i, "Sell"] = True
                     else:
                         if logic == True:
-                            self.data["Sell"][i] = self.data["Sell"][i] and True
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] and True
                         else:
-                            self.data["Sell"][i] = self.data["Sell"][i] or True
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] or True
                 else:
-                    if self.data["Sell"][i] == None:
-                        self.data["Sell"][i] = False
+                    if self.data.loc[i, "Sell"] == None:
+                        self.data.loc[i, "Sell"] = False
                     else:
                         if logic == True:
-                            self.data["Sell"][i] = self.data["Sell"][i] and False
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] and False
                         else:
-                            self.data["Sell"][i] = self.data["Sell"][i] or False
+                            self.data.loc[i, "Sell"] = self.data.loc[i, "Sell"] or False
             self.strategyList["Sell"].append(line + " above " + str(upperBoundary))
 
 if __name__ == "__main__":

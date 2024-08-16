@@ -101,7 +101,7 @@ class Indicator:
             self.data[signalName] = self.data[MACDName].ewm(span=signalAverageInterval, min_periods=signalAverageInterval).mean()
             self.addIndicator("MACD-Signal", signalName)
 
-        return (signalName, MACDName)
+        return (MACDName, signalName)
 
     def makeRSI(self, averageInterval: int) -> None:
 
