@@ -220,13 +220,18 @@ with dataTab:
                             )
                     with st.container(border=True):
                         initialFund = st.number_input("Initial Fund", value=100000)
-                        stockAmountBuy = st.number_input("Number of stock per position Buy", value=100)
-                        stockAmountSell = st.number_input("Number of stock per position Sell", value=100)
+
+                        usePercentBuy = st.toggle("Use Percent to buy", value=False)
+                        stockAmountBuy = st.number_input("Number/Percent of stock per position Buy", value=100.0)
+                        usePercentSell = st.toggle("Use Percent to sell", value=False)
+                        stockAmountSell = st.number_input("Number/Percent of stock per position Sell", value=100.0)
+                        minimumStockPerPosition = st.number_input("Minimum number of stock per position (for Percent)", value=100.0)
+
                         if st.button("Run Test", type="primary"):
                             backtestr = Backtestr(st.session_state.data, ticker_symbol)
                             st.session_state.backtestr = backtestr
 
-                            netValue = st.session_state.backtestr.runTest(initialFund, stockAmountBuy, stockAmountSell)
+                            netValue = st.session_state.backtestr.runTest(initialFund=initialFund, usePercentBuy=usePercentBuy, stockAmountBuy=stockAmountBuy, usePercentSell=usePercentSell, stockAmountSell=stockAmountSell, minimumStockPerPosition=minimumStockPerPosition)
                             st.write(netValue)
 
                             buy_signals = st.session_state.data[st.session_state.data['Buy'] == True]
@@ -316,3 +321,58 @@ with featureRequestTab:
                     st.error('All fields are required.')
                 else:
                     st.success('Feature request submitted successfully!')
+
+with docTab:
+    st.write("### Portfolio")
+    with st.expander("- **Initialize Portfolio**"):
+        st.code('''Portfolio = Portfolio(data) # let data be dataframe containing Open, Close, High, and Low values''')
+    with st.expander("- **Set buy position**"):
+        st.code('''Portfolio.buy(stockName: str, stockAmount: int, stockPrice: float)''')
+        st.markdown("""
+                    * **Input**
+                        * :red[stockName]: The name of the stock
+                        * :red[stockAmount]: the number of stock to buy in this position
+                        * :red[stockPrice]: The price of stock to buy at your position
+                    * **Output**
+                        * :red[Boolean]: :blue[True] if the order is valid and :blue[False] otherwise
+                    """)
+    with st.expander("- **Set sell position**"):
+        st.code('''Portfolio.sell(stockName: str, stockAmount: int, stockPrice: float)''')
+        st.markdown("""
+                    * **Input**
+                        * :red[stockName]: The name of the stock
+                        * :red[stockAmount]: the number of stock to sell in this position
+                        * :red[stockPrice]: The price of stock to sell at your position
+                    * **Output**
+                        * :red[Boolean]: :blue[True] if the order is valid and :blue[False] otherwise
+                    """)
+    with st.expander("- **Get the amount of cash in the portfolio**"):
+        st.code('''Portfolio.getCash()''')
+        st.markdown("""
+                    * **Input**
+                        * :blue[None]
+                    * **Output**
+                        * :red[Float]: Total cash left in the portfolio
+                    """)
+    with st.expander("- **Add Fund**"):
+        st.code('''Portfolio.addFund(fund: float)''')
+    with st.expander("- **Sell all current stock**"):
+        st.code('''Portfolio.cashOut(cashAmout: float)''')
+    with st.expander("- **Get number of specific stock in the portfolio**"):
+        st.code('''Portfolio.getStockAmount(stockName: str)''')
+    with st.expander("- **Get the valud of all stock in the portfolio**"):
+        st.code('''Portfolio.getStockValue()''')
+    with st.expander("- **Get portfolio net value**"):
+        st.code('''Portfolio.getNetValue()''')
+    with st.expander("- **Get current set fee**"):
+        st.code('''Portfolio.getFee()''')
+    with st.expander("- **Set current fee**"):
+        st.code('''Portfolio.setFee()''')
+    with st.expander("- **Add audit log**"):
+        st.code('''Portfolio.addLog(action: str, stockName: str, amount: int, price: float, date: object)''')
+    with st.expander("- **Get all audit log**"):
+        st.code('''Portfolio.getLog()''')
+    with st.expander("- **Get number of each stocks in the portfolio**"):
+        st.code('''Portfolio.getStockDirectory()''')
+    with st.expander("- **Show portfolio details**"):
+        st.code('''print(portfolio)''')
