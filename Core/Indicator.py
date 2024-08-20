@@ -9,7 +9,8 @@ class Indicator:
             "RSI": set(),
             "StochRSI": set(),
             "StochOscillator": set(),
-            "LinearLine": set()
+            "RSILinearLine": set(),
+            "MACDLinearLine": set()
         }
         self.relatedColumn = {}
 
@@ -177,10 +178,24 @@ class Indicator:
             
             return str(indicatorName)
         
-    def makeLinearLine(self, value: int):
+    def makeRSILinearLine(self, value: int):
         
-        indicatorType = "LinearLine"
-        indicatorName = "LinearLine" + str(value)
+        indicatorType = "RSILinearLine"
+        indicatorName = "RSILinearLine" + str(value)
+
+        if not self.hasIndicator(indicatorType, indicatorName):
+            self.relatedColumn[indicatorName] = [indicatorName]
+
+            self.data[indicatorName] = value
+
+            self.addIndicator(indicatorType, indicatorName)
+
+            return str(indicatorName)
+    
+    def makeMACDLinearLine(self, value: int):
+        
+        indicatorType = "MACDLinearLine"
+        indicatorName = "MACDLinearLine" + str(value)
 
         if not self.hasIndicator(indicatorType, indicatorName):
             self.relatedColumn[indicatorName] = [indicatorName]

@@ -53,15 +53,15 @@ with dataTab:
             st.write("##### 2. Add indicator(s)")
             st.write("- Added indicator(s) can be plotted in the Chart Tab")
             with st.container(border=True):
-                selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator", "LinearLine"), key="input_indicator")
+                selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator", "RSILinearLine", "MACDLinearLine"), key="input_indicator")
                 if selectedIndicator in ["MA", "EMA", "RSI", "StochRSI", "StochOscillator"]:
                     averageInterval = st.slider("Average Interval", min_value=0, max_value=100, step=1, value=20)
                 if selectedIndicator in ["MACD"]:
                     firstAverageInterval = st.slider("First Average Interval", min_value=1, max_value=100, step=1, value=12)
                     secondAverageInterval = st.slider("Second Average Interval", min_value=1, max_value=100, step=1, value=26)
                     signalAverageInterval = st.slider("Signal Average Interval", min_value=1, max_value=100, step=1, value=9)
-                if selectedIndicator in ["LinearLine"]:
-                    value = st.slider("Value", min_value=0.0, max_value=1.0, step=0.01, value=0.5)
+                if "LinearLine" in selectedIndicator:
+                    value = st.slider("Value", min_value=-1.0, max_value=1.0, step=0.01, value=0.0)
                     
                 if st.button("Add Indicator"):
                     if selectedIndicator == "MA":
@@ -76,8 +76,10 @@ with dataTab:
                         st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
                     if selectedIndicator == "StochOscillator":
                         st.session_state.indicator.makeStochOscillator(averageInterval=averageInterval)
-                    if selectedIndicator == "LinearLine":
-                        st.session_state.indicator.makeLinearLine(value)
+                    if selectedIndicator == "RSILinearLine":
+                        st.session_state.indicator.makeRSILinearLine(value)
+                    if selectedIndicator == "MACDLinearLine":
+                        st.session_state.indicator.makeMACDLinearLine(value)
             
                 st.write(st.session_state.indicator)
 
@@ -166,8 +168,15 @@ with dataTab:
                         mode='lines',
                         name=indicatorName
                     ))
-                elif "LinearLine" in indicatorName:
+                elif "RSILinearLine" in indicatorName:
                     RSIChart.add_trace(go.Scatter(
+                        x=st.session_state.data.index,
+                        y=st.session_state.data[indicatorName],
+                        mode='lines',
+                        name=indicatorName
+                    ))
+                elif "MACDLinearLine" in indicatorName:
+                    MACDChart.add_trace(go.Scatter(
                         x=st.session_state.data.index,
                         y=st.session_state.data[indicatorName],
                         mode='lines',
