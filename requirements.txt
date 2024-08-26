@@ -10,3 +10,4 @@ schedule==1.2.2
 streamlit==1.37.0
 tzdata==2024.1
 yfinance==0.2.41
+streamlit-nested-layout

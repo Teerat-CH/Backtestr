@@ -6,6 +6,9 @@ import pandas as pd
 import streamlit as st
 import yfinance as yf
 import plotly.graph_objs as go
+import streamlit_nested_layout
+import smtplib
+from email.mime.text import MIMEText
 
 st.set_page_config(layout="wide")
 
@@ -53,7 +56,9 @@ with dataTab:
             st.write("##### 2. Add indicator(s)")
             st.write("- Added indicator(s) can be plotted in the Chart Tab")
             with st.container(border=True):
-                selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator", "RSILinearLine", "MACDLinearLine"), key="input_indicator")
+                selectIndicatorCol, addIndicatorCol = st.columns([5,1])
+                with selectIndicatorCol:
+                    selectedIndicator = st.selectbox("Select Indicator", ("---", "MA", "EMA", "MACD", "RSI", "StochRSI", "StochOscillator", "RSILinearLine", "MACDLinearLine"), key="input_indicator")
                 if selectedIndicator in ["MA", "EMA", "RSI", "StochRSI", "StochOscillator"]:
                     averageInterval = st.slider("Average Interval", min_value=0, max_value=100, step=1, value=20)
                 if selectedIndicator in ["MACD"]:
@@ -62,24 +67,26 @@ with dataTab:
                     signalAverageInterval = st.slider("Signal Average Interval", min_value=1, max_value=100, step=1, value=9)
                 if "LinearLine" in selectedIndicator:
                     value = st.slider("Value", min_value=-1.0, max_value=1.0, step=0.01, value=0.0)
-                    
-                if st.button("Add Indicator"):
-                    if selectedIndicator == "MA":
-                        st.session_state.indicator.makeMA(averageInterval=averageInterval)
-                    if selectedIndicator == "EMA":
-                        st.session_state.indicator.makeEMA(averageInterval=averageInterval)
-                    if selectedIndicator == "MACD":
-                        st.session_state.indicator.makeMACD(firstAverageInterval=firstAverageInterval, secondAverageInterval=secondAverageInterval, signalAverageInterval=signalAverageInterval)
-                    if selectedIndicator == "RSI":
-                        st.session_state.indicator.makeRSI(averageInterval=averageInterval)
-                    if selectedIndicator == "StochRSI":
-                        st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
-                    if selectedIndicator == "StochOscillator":
-                        st.session_state.indicator.makeStochOscillator(averageInterval=averageInterval)
-                    if selectedIndicator == "RSILinearLine":
-                        st.session_state.indicator.makeRSILinearLine(value)
-                    if selectedIndicator == "MACDLinearLine":
-                        st.session_state.indicator.makeMACDLinearLine(value)
+                
+                with addIndicatorCol:
+                    st.write("######")
+                    if st.button("Add"):
+                        if selectedIndicator == "MA":
+                            st.session_state.indicator.makeMA(averageInterval=averageInterval)
+                        if selectedIndicator == "EMA":
+                            st.session_state.indicator.makeEMA(averageInterval=averageInterval)
+                        if selectedIndicator == "MACD":
+                            st.session_state.indicator.makeMACD(firstAverageInterval=firstAverageInterval, secondAverageInterval=secondAverageInterval, signalAverageInterval=signalAverageInterval)
+                        if selectedIndicator == "RSI":
+                            st.session_state.indicator.makeRSI(averageInterval=averageInterval)
+                        if selectedIndicator == "StochRSI":
+                            st.session_state.indicator.makeStochRSI(averageInterval=averageInterval)
+                        if selectedIndicator == "StochOscillator":
+                            st.session_state.indicator.makeStochOscillator(averageInterval=averageInterval)
+                        if selectedIndicator == "RSILinearLine":
+                            st.session_state.indicator.makeRSILinearLine(value)
+                        if selectedIndicator == "MACDLinearLine":
+                            st.session_state.indicator.makeMACDLinearLine(value)
             
                 st.write(st.session_state.indicator)
 
@@ -102,31 +109,41 @@ with dataTab:
                     with column3:
                         upperBoundary = st.number_input("Upper Boundary", value=0.8)
 
-                andOr = st.toggle("And/Or", value=False)
-                if andOr:
-                    st.write(f"Use **AND**")
-                else:
-                    st.write(f"Use **OR**")
+                andOrCol, terminateCol, spaceCol_toggle = st.columns([1, 1, 2])
 
-                terminate = st.toggle("Terminate", value = False)
+                with andOrCol:
+                    andOr = st.toggle("And/Or", value=False)
 
-                if st.button("Add Buy Strategy"):
-                    if selectedStrategy == "Cross Over":
-                        st.session_state.strategy.useCrossOver(action="buy", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
-                    if selectedStrategy == "Boundary":
-                        st.session_state.strategy.useUpperLowerBoundary(action="buy", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+                    if andOr:
+                        st.write(f"Use **AND**")
+                    else:
+                        st.write(f"Use **OR**")
 
-                if st.button("Add Sell Strategy"):
-                    if selectedStrategy == "Cross Over":
-                        st.session_state.strategy.useCrossOver(action="sell", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
-                    if selectedStrategy == "Boundary":
-                        st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+                with terminateCol:
+                    terminate = st.toggle("Terminate", value = False)
+                    st.write("Terminate = " + "**" + str(terminate) + "**")
 
-                if st.button("Clear Strategy"):
-                    st.session_state.strategy.clearStrategy()
+                addBuyStrategyCol, addSellStrategyCol, clearStrategyCol, spaceCol = st.columns([1, 1, 1, 0.5])
+
+                with addBuyStrategyCol:
+                    if st.button("Add Buy Strategy"):
+                        if selectedStrategy == "Cross Over":
+                            st.session_state.strategy.useCrossOver(action="buy", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
+                        if selectedStrategy == "Boundary":
+                            st.session_state.strategy.useUpperLowerBoundary(action="buy", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+
+                with addSellStrategyCol:
+                    if st.button("Add Sell Strategy"):
+                        if selectedStrategy == "Cross Over":
+                            st.session_state.strategy.useCrossOver(action="sell", logic=andOr, terminate=terminate, firstLine=firstLine, secondLine=secondLine)
+                        if selectedStrategy == "Boundary":
+                            st.session_state.strategy.useUpperLowerBoundary(action="sell", logic=andOr, terminate=terminate, line=line, upperBoundary=upperBoundary, lowerBoundary=lowerBoundary)
+
+                with clearStrategyCol:
+                    if st.button("Clear Strategy"):
+                        st.session_state.strategy.clearStrategy()
                     
                 st.write(st.session_state.strategy.getStrategyList())
-                st.write(st.session_state.data)
 
         with graphTab:
             indicatorList = st.session_state.indicator.getIndicatorList()
@@ -230,43 +247,48 @@ with dataTab:
                     with st.container(border=True):
                         initialFund = st.number_input("Initial Fund", value=100000)
 
-                        usePercentBuy = st.toggle("Use Percent to buy", value=False)
-                        stockAmountBuy = st.number_input("Number/Percent of stock per position Buy", value=100.0)
-                        usePercentSell = st.toggle("Use Percent to sell", value=False)
-                        stockAmountSell = st.number_input("Number/Percent of stock per position Sell", value=100.0)
-                        minimumStockPerPosition = st.number_input("Minimum number of stock per position (for Percent)", value=100.0)
+                        usePercentBuy = False
+                        usePercentSell = False
+                        stockAmountBuyCol, stockAmountSellCol, runTestCol = st.columns([3, 3, 1])
+                        with stockAmountBuyCol:
+                            stockAmountBuy = st.number_input("Number of stock per position Buy", value=100.0)
+                        with stockAmountSellCol:
+                            stockAmountSell = st.number_input("Number of stock per position Sell", value=100.0)
+                        minimumStockPerPosition = 0
 
-                        if st.button("Run Test", type="primary"):
-                            backtestr = Backtestr(st.session_state.data, ticker_symbol)
-                            st.session_state.backtestr = backtestr
+                        with runTestCol:
+                            st.write("######")
+                            if st.button("Run", type="primary"):
+                                backtestr = Backtestr(st.session_state.data, ticker_symbol)
+                                st.session_state.backtestr = backtestr
 
-                            netValue = st.session_state.backtestr.runTest(initialFund=initialFund, usePercentBuy=usePercentBuy, stockAmountBuy=stockAmountBuy, usePercentSell=usePercentSell, stockAmountSell=stockAmountSell, minimumStockPerPosition=minimumStockPerPosition)
-                            st.write(netValue)
+                                netValue = st.session_state.backtestr.runTest(initialFund=initialFund, usePercentBuy=usePercentBuy, stockAmountBuy=stockAmountBuy, usePercentSell=usePercentSell, stockAmountSell=stockAmountSell, minimumStockPerPosition=minimumStockPerPosition)
+                                st.write(netValue)
 
-                            buy_signals = st.session_state.data[st.session_state.data['Buy'] == True]
-                            sell_signals = st.session_state.data[st.session_state.data['Sell'] == True]
+                                buy_signals = st.session_state.data[st.session_state.data['Buy'] == True]
+                                sell_signals = st.session_state.data[st.session_state.data['Sell'] == True]
 
-                            mainChart.add_trace(go.Scatter(
-                                x=buy_signals.index,
-                                y=buy_signals['Low']*97/100,  # Place markers just below the low price
-                                mode='markers',
-                                marker=dict(symbol='triangle-up', color='green', size=10),
-                                name='Buy'
-                            ))
-                            mainChart.add_trace(go.Scatter(
-                                x=sell_signals.index,
-                                y=sell_signals['High']*103/100,  # Place markers just below the low price
-                                mode='markers',
-                                marker=dict(symbol='triangle-down', color='red', size=10),
-                                name='Sell'
-                            ))
+                                mainChart.add_trace(go.Scatter(
+                                    x=buy_signals.index,
+                                    y=buy_signals['Low']*97/100,  # Place markers just below the low price
+                                    mode='markers',
+                                    marker=dict(symbol='triangle-up', color='green', size=10),
+                                    name='Buy'
+                                ))
+                                mainChart.add_trace(go.Scatter(
+                                    x=sell_signals.index,
+                                    y=sell_signals['High']*103/100,  # Place markers just below the low price
+                                    mode='markers',
+                                    marker=dict(symbol='triangle-down', color='red', size=10),
+                                    name='Sell'
+                                ))
 
-                            netValueChart.add_trace(go.Scatter(
-                                                x=st.session_state.data.index,
-                                                y=st.session_state.data.netValue,
-                                                mode='lines',
-                                                name='Net Value'
-                                            ))
+                                netValueChart.add_trace(go.Scatter(
+                                                    x=st.session_state.data.index,
+                                                    y=st.session_state.data.netValue,
+                                                    mode='lines',
+                                                    name='Net Value'
+                                                ))
                         st.write(netValueChart)
             with st.container(border=True):
                 st.write(mainChart)
@@ -276,6 +298,8 @@ with dataTab:
                 st.write(RSIChart)
 
 with searchTab:
+    st.header("Coming Soon!")
+    st.write("- Stock search will allow you to search for a stock that meet your condition(s). For example, searching for a stock whose MACD just cross over or RSI is oversold will be possible.")
     stockList = []
     searchOption = st.selectbox("Search From", ["SET50"])
     period = st.selectbox("Period", ("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"))
@@ -305,8 +329,12 @@ with searchTab:
 
 
 with featureRequestTab:
-    featureRequestTab_col1, featureRequestTab_col2, featureRequestTab_col3 = st.columns([1,1,1])
+    featureRequestTab_col1, featureRequestTab_col2, featureRequestTab_col3, featureRequestTab_col4 = st.columns([1,1,1,1])
+
     with featureRequestTab_col2:
+        pass
+
+    with featureRequestTab_col3:
         with st.form(key='feature_request_form'):
             st.subheader('Feature Request Form')
             # Collect user inputs
@@ -325,11 +353,44 @@ with featureRequestTab:
             # Submit button
             submit_button = st.form_submit_button(label='Submit', type="primary")
 
+            email_sender = 'teerat.backtestr@gmail.com'
+            email_receiver = 'teerat.backtestr@gmail.com'
+
+            subject = "Backtestr -"
+
+            if new_feature:
+                subject += " New Feature,"
+            if improvement:
+                subject += " Improvement,"
+            if bug_report:
+                subject += " Bug Report,"
+            if other:
+                subject += " Other: " + other_text
+
+            body = "From " + name + "\n" + email + "\n\n"
+            body += description
+
             if submit_button:
                 if not (name and email and (new_feature or improvement or bug_report or (other and other_text)) and description):
                     st.error('All fields are required.')
                 else:
-                    st.success('Feature request submitted successfully!')
+                    try:
+                        with st.spinner("Submitting the form"):
+                            msg = MIMEText(body)
+                            msg['From'] = email_sender
+                            msg['To'] = email_receiver
+                            msg['Subject'] = subject
+
+                            server = smtplib.SMTP('smtp.gmail.com', 587)
+                            server.starttls()
+                            server.login(st.secrets["email"]["gmail"], st.secrets["email"]["password"])
+                            server.sendmail(email_sender, email_receiver, msg.as_string())
+                            server.quit()
+
+                        st.success('Form submitted successfully! 🚀')
+                    except Exception as e:
+                        st.error("Failed to submit the form")
+                
 
 with docTab:
     st.write("### Portfolio")
