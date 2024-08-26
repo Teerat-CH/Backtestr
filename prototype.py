@@ -389,7 +389,7 @@ with featureRequestTab:
 
                         st.success('Form submitted successfully! 🚀')
                     except Exception as e:
-                        st.error("Failed to submit the form")
+                        st.error("Failed to submit the form" + str(e))
                 
 
 with docTab:
