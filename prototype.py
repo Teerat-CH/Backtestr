@@ -441,6 +441,7 @@ with docTab:
     st.markdown('''##### 5. Things to keep in mind
     - To ensure accuracy, the backtest will be done on a T+1 basis. For instance, if a buy condition is met on the current candle, the portfolio will execute the buy on the next candle at the opening price.
     - The buy and sell tickers reflect when your strategy's conditions are met. If there isn't enough cash in the portfolio at the time of a buy signal, the order will not be executed.
+    - The buy and sell tickers might disappear after adding indicators to the chart. Please simply go back to the home page and run the test again.
              ''')
 
     # st.write("### Portfolio")
