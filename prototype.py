@@ -334,18 +334,19 @@ with featureRequestTab:
     with featureRequestTab_col2:
         st.write("### Upcoming Features")
         st.write('''
-                * :green-background[ ✅ Launched ]
-                    * **Add indicators such as EMA, MACD, RSI, and more**
-                    * **And or Or condition when add a new strategy**
-                    * **Allow terminate option when adding the new strategy to sell all the stock when receive sell signal from this strategy**
-                * :orange-background[ 👷 In development ]
-                    * **Stock search function that pick out the stock that match the requirements**
-                    * **Buy and Sell stocks using percent instead of exact number**
-                    * **Smoothing function that smooth the line of the indicator**
-                * :blue-background[ 👟 Planning ]
-                    * **Allow saving for all settings including indicators and strategies**
-                    * **Up and down coloring for line indicator**
-                 ''')
+            * :green-background[ ✅ Launched ]
+                * **Add indicators such as EMA, MACD, RSI, and more**
+                * **And or Or condition when adding a new strategy**
+                * **Allow terminate option when adding the new strategy to sell all the stock when receiving a sell signal from this strategy**
+            * :orange-background[ 👷 In development ]
+                * **Stock search function that picks out the stocks that match the requirements**
+                * **Buy and sell stocks using percent instead of exact number**
+                * **Smoothing function that smooths the line of the indicator**
+            * :blue-background[ 👟 Planning ]
+                * **Allow saving for all settings, including indicators and strategies**
+                * **Allow backtesting on self-upload dataframe/csv file**
+                * **Up and down coloring for line indicator**
+            ''')
 
     with featureRequestTab_col3:
         with st.form(key='feature_request_form'):
@@ -408,38 +409,38 @@ with featureRequestTab:
 with docTab:
     st.header("Using Backtestr")
     st.markdown('''##### 1. Select and Download Stock Data
-    - Select the stock, Period (How long ago data do you want), and the timeframe (interval).
-    - If the data for that specific configuration is available, the dataframe will pop up. click download button.
-    - At this stage you can now view the candle chart on the chart tab.
+    - Select the stock, the stock period (how long ago data do you want), and the timeframe (interval).
+    - If the data for that specific configuration is available, the dataframe will pop up. click the download button.
+    - At this stage, you can now view the candle chart on the chart tab.
              ''')
     st.markdown('''##### 2. Add indicator(s)
-    - Select a indicator you wish to use from the drop down manu. Enter value(s) for each indicator as prompted. Then click add.
-    - You can now view those indicator you have added in the chart tab. Switching to the chart tab and select the indicator you have added from the dropdown manu.
-    - There might be more indicator than you have added as some of them are create via the creation of other indicator. For example. EMA will be created as part of the MACD creation.
-    - After you have add the desired indicator(s), proceed to the part to add strategy.
+    - Select an indicator you wish to use from the drop-down menu. Enter the value(s) for each indicator as prompted. Then click add.
+    - You can now view the indicators you have added in the chart tab. Switch to the chart tab and select the indicator you have added from the drop-down menu.
+    - There might be more indicators than you have added, as some of them were created via the creation of other indicators. For example. EMA will be created as part of the MACD.
+    - After you have added the desired indicator(s), proceed to the part to add strategy.
              ''')
     st.markdown('''##### 3. Add Buy and Sell Strategy
-    - At the moment there are two type of strategy: Cross Over and Boundary.
-        - For Cross Over, there will be buy/sell signal if and only if the first selected indicator cross up/down over the second selected indicator.
-        - For Boundary, there will be buy/sell signal if the selected indicator is under/over a specific value.
-    - After adding the first strategy, you can decide whether to use add or or as a condition when adding a new strategy.
-        - And condition will only allow buy/sell strategy if and only if both strategy are satisfied.
-        - Or condition will allow buy/sell strategy to happen when either of the strategy condition is satisfied.
-    - terminate option means the stock will be sold if there is a sell signal from that strategy. This can be use full when you have bought, for example, 500 stocks and only sell 100 each time but want to sell everything that is left when specific condition is satisfied.
-    - you will have to add buy and sell strategy separately, and all of the strategy can be reset throught the clear strategy button.
+    - At the moment, there are two types of strategies: cross-over and boundary.
+        - For cross-over, there will be a buy/sell signal if and only if the first selected indicator crosses up or down over the second selected indicator.
+        - For boundary, there will be a buy/sell signal if the selected indicator is under or over a specific value.
+    - After adding the first strategy, you can decide whether to use AND or OR as a condition when adding a new strategy.
+        - AND condition will only allow the buy/sell strategy if and only if both strategies are satisfied.
+        - OR condition will allow the buy/sell strategy to happen when either of the strategy conditions is satisfied.
+    - The terminate option means the stock will be sold if there is a sell signal from that strategy. This will be useful when you have bought, for example, 500 stocks and only sell 100 each time but want to sell everything that is left when a specific condition is satisfied.
+    - You will have to add buy and sell strategies separately, and all of the strategies can be reset through the clear strategy button.
              ''')
     st.markdown('''##### 4. Run the Back Test!
-    - This is the last step of testing your strategy. Proceed to add the initial amount of money in your portfolio.
-    - After that add the amount of stock you want to buy/sell in each position.
-    - Click run and you should see the graph of your total portfolio value over time as you using the strategy.
-        - If you see the straight line these are two common mistake that can happen
-            - The amount of money inside the portfolio is not enough to buy that the amount of stock you have set.
-            - The strategy you have add result in no buy/sell strategy. This could be the result of using *And* condition.
-    - If you switched to the chart tab, green and red ticker should be available in the candle chart indicating all of you buy and sell position.
+    - This is the last step in testing your strategy. Proceed to add the initial amount of money to your portfolio.
+    - After that, add the amount of stock you want to buy or sell in each position.
+    - Click run, and you should see the graph of your total portfolio value over time as you use the strategy.
+        - If you see the straight line, these are two common mistakes that can happen.
+            - The amount of money inside the portfolio is not enough to buy the amount of stock you have set.
+            - The strategy you have added results in no buy or sell position. This could be the result of using the AND condition.
+    - If you switched to the chart tab, green and red tickers should be available in the candle chart, indicating all of your buy and sell positions.
              ''')
     st.markdown('''##### 5. Things to keep in mind
-    - For the accuracy purpose, the back test will be perform on t+1 practice. For example, if the buy signal happen on your current candle, the portfolio will buy on the next candle at the open price.
-    - The buy and sell ticker only represent when the condition of your strategy are met. If you do not have enough cash in the portfolio when the buy signal happen, the portfolio will not execute that buy order.
+    - To ensure accuracy, the backtest will be done on a T+1 basis. For instance, if a buy condition is met on the current candle, the portfolio will execute the buy on the next candle at the opening price.
+    - The buy and sell tickers reflect when your strategy's conditions are met. If there isn't enough cash in the portfolio at the time of a buy signal, the order will not be executed.
              ''')
 
     # st.write("### Portfolio")
